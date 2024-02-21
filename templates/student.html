@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}
+Add New Student
+{% endblock %}
+{% block content %}
+        <form action="{{ url_for('addrec') }}" method="POST">
+            <h3>Please Add the New Student Information:</h3>
+            Username<br>
+            <input class="input" placeholder="Username" type="text" name="nm" /><br><br>
+
+            Address<br>
+            <input class="input" placeholder="Address" type="text" name="add" /><br><br>
+
+            City<br>
+            <input class="input" placeholder="City" type="text" name="city" /><br><br>
+
+            Zip Code<br>
+            <input class="input" placeholder="Zip Code" type="text" name="zip" /><br><br>
+            
+            Password<br>
+            <input class="input" placeholder="Password" type="text" name="password" /><br>
+            
+            <br>
+            <input class="input" placeholder="text" type="submit" value="Submit" /><br>
+            
+        </form>
+{% endblock %}
