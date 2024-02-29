@@ -3,6 +3,7 @@ from flask import Flask
 from flask import render_template
 from flask import request
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -36,9 +37,9 @@ def authenticate():
         user = cursor.fetchone()
 
         if user:
-            # Successful authentication, redirect to viewrooms.html
+            # Successful authentication, redirect to selectvenue.html
             conn.close()
-            return render_template('viewrooms.html')
+            return render_template('selectvenue.html')
         else:
             # Authentication failed, render login.html with an error message
             conn.close()
@@ -166,3 +167,45 @@ def delete():
             con.close()
             # Send the transaction message to result.html
             return render_template('result.html',msg=msg)
+
+
+@app.route("/redirectvenue", methods=['POST','GET'])
+def redirectvenue():
+    selected_venue = request.args.get('venue')
+    if selected_venue == 'Auditorium':
+        return render_template('auditorium.html')
+    elif selected_venue == 'parking_slot':
+        return render_template('parking_slot.html')
+    elif selected_venue == 'AC_building':
+        return render_template('AC_building.html')
+    else: 
+        return render_template('selectvenue.html')  
+
+def get_room_availability(room_id, current_day, time_slot):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    # Use a prepared statement to prevent SQL injection
+    query = f"SELECT {room_id} FROM acFloor1 WHERE day = ? AND time_slot = ? AND {room_id} IS NOT NULL"
+    cursor.execute(query, (current_day, time_slot))
+    
+    result = cursor.fetchone()  # Fetch a single row since we're looking for a specific time_slot
+    
+    if result:
+        availability = result[0]
+        return availability
+    else:
+        return None  # Return None if no availability is found
+
+
+@app.route("/selectacfloor", methods=['POST','GET'])
+def selectacfloor():
+    selected_venue = request.args.get('venue')
+    current_day = datetime.now().strftime('%A')
+    if selected_venue == '1':
+        return render_template('acfloor1.html', current_day=current_day,get_room_availability=get_room_availability)
+    elif selected_venue == '2':
+        return render_template('acfloor2.html', current_day=current_day,get_room_availability=get_room_availability)
+    else:
+        return render_template('AC_building.html')
+

@@ -5,7 +5,7 @@ Add New Student
 {% block content %}
         <form action="{{ url_for('addrec') }}" method="POST">
             <h3>Please Add the New Student Information:</h3>
-            Username<br>
+            *Username<br>
             <input class="input" placeholder="Username" type="text" name="nm" /><br><br>
 
             Address<br>
@@ -17,7 +17,7 @@ Add New Student
             Zip Code<br>
             <input class="input" placeholder="Zip Code" type="text" name="zip" /><br><br>
             
-            Password<br>
+            *Password<br>
             <input class="input" placeholder="Password" type="text" name="password" /><br>
             
             <br>
