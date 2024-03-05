@@ -5,8 +5,8 @@
 {% block content %}
     <div class="rooms-container">
         {% if current_day %}
-        <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
-        <table class="availability-table">
+            <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
+            <table class="availability-table">
                 <tr>
                     <th>Time Slot</th>
                     <th>Room 101</th>
@@ -20,27 +20,19 @@
                         <td>{{ time_slot }}</td>
                         <td>
                             {% set room_availability = get_room_availability('r101', current_day, time_slot, floor) %}
-                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
-                                <h2>Room 101 </h2>
-                            </div>
+                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% else %}{% endif %}" >
                         </td>
                         <td>
                             {% set room_availability = get_room_availability('r102', current_day, time_slot, floor) %}
-                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
-                                <h2>Room 102 </h2>
-                            </div>
+                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% endif %}" >
                         </td>
                         <td>
                             {% set room_availability = get_room_availability('r103', current_day, time_slot, floor) %}
-                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
-                                <h2>Room 103 </h2>
-                            </div>
+                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% endif %}" >
                         </td>
                         <td>
                             {% set room_availability = get_room_availability('r104', current_day, time_slot, floor) %}
-                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
-                                <h2>Room 104 </h2>
-                            </div>
+                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% endif %}" >
                         </td>
                     </tr>
                 {% endfor %}

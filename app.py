@@ -2,11 +2,15 @@
 from flask import Flask
 from flask import render_template
 from flask import request
-import sqlite3
+from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+import sqlite3
+
 
 app = Flask(__name__)
 
+admin_id = 'cap'
+admin_password = '1234'
 # Home Page route
 @app.route("/")
 def home():
@@ -35,19 +39,20 @@ def authenticate():
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM students WHERE name=? AND password=?', (username, password))
         user = cursor.fetchone()
-
-        if user:
-            # Successful authentication, redirect to selectvenue.html
-            conn.close()
-            return render_template('selectvenue.html')
+        if(username == 'cap' and password == admin_password):
+            return render_template('adminlogin.html')            
         else:
-            # Authentication failed, render login.html with an error message
-            conn.close()
-            return render_template("login.html", error="Invalid username or password")
+            if user:
+                # Successful authentication, redirect to selectvenue.html
+                conn.close()
+                return render_template('selectvenue.html')
+            else:
+                # Authentication failed, render login.html with an error message
+                conn.close()
+                return render_template("login.html", error="Invalid username or password")
 
     else:
-        # Handle GET request (if needed)
-        return render_template("login.html")
+            return render_template("login.html")
 
 
 # Route to add a new record (INSERT) student data to the database
@@ -181,12 +186,15 @@ def redirectvenue():
     else: 
         return render_template('selectvenue.html')  
 
-def get_room_availability(room_id, current_day, time_slot):
+def get_room_availability(room_id, current_day, time_slot, floor):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
+
+    # Choose the appropriate table based on the floor
+    table_name = f'acFloor{floor}'
     
     # Use a prepared statement to prevent SQL injection
-    query = f"SELECT {room_id} FROM acFloor1 WHERE day = ? AND time_slot = ? AND {room_id} IS NOT NULL"
+    query = f"SELECT {room_id} FROM {table_name} WHERE day = ? AND time_slot = ? AND {room_id} IS NOT NULL"
     cursor.execute(query, (current_day, time_slot))
     
     result = cursor.fetchone()  # Fetch a single row since we're looking for a specific time_slot
@@ -198,14 +206,29 @@ def get_room_availability(room_id, current_day, time_slot):
         return None  # Return None if no availability is found
 
 
+
 @app.route("/selectacfloor", methods=['POST','GET'])
 def selectacfloor():
     selected_venue = request.args.get('venue')
     current_day = datetime.now().strftime('%A')
     if selected_venue == '1':
-        return render_template('acfloor1.html', current_day=current_day,get_room_availability=get_room_availability)
+        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
     elif selected_venue == '2':
-        return render_template('acfloor2.html', current_day=current_day,get_room_availability=get_room_availability)
+        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
     else:
         return render_template('AC_building.html')
 
+@app.route("/editvenue", methods=['POST','GET'])
+def editvenue():
+    selected_venue = request.args.get('venue')
+    current_day = datetime.now().strftime('%A')
+    if selected_venue == 'Auditorium':
+        return render_template('editauditorium.html')
+    elif selected_venue == 'parking_slot':
+        return render_template('editparking_slot.html')
+    elif selected_venue == 'AC_floor1':
+        return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+    elif selected_venue == 'AC_floor2':
+        return render_template('editAC_floor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
+    else: 
+        return render_template('selectvenue.html')

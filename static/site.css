@@ -74,20 +74,18 @@ footer {
 
 .rooms-container {
     display: flex;
-    flex-direction: column; /* Display days vertically */
+    flex-direction: column; 
     align-items: stretch;
     margin: 20px;
 }
 
-/* Style for each individual day row */
 .day-column {
     display: flex;
-    flex-direction: row; /* Display room cards horizontally */
+    flex-direction: row; 
     align-items: center;
     margin-bottom: 10px;
 }
 
-/* Style for each individual room card */
 .room-card {
     width: 130px;
     height: 30px;
@@ -129,9 +127,6 @@ footer {
                -6px -6px 12px #ffffff;
 }
 
-
-
-/* Form container styling */
 .form-venue {
     max-width: 400px;
     margin: 20px auto;
@@ -142,14 +137,12 @@ footer {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Label styling */
 .form-venue label {
     display: block;
     margin-bottom: 8px;
     font-size: 16px;
 }
 
-/* Select box styling */
 .form-venue select {
     width: 100%;
     padding: 10px;
@@ -159,7 +152,6 @@ footer {
     box-sizing: border-box;
 }
 
-/* Submit button styling */
 .form-venue input[type="submit"] {
     background-color: #007BFF;
     color: #fff;
@@ -170,10 +162,40 @@ footer {
     cursor: pointer;
 }
 
-/* Centered header styling */
 .form-venue h1 {
     text-align: center;
 }
 
-/* Add more styles as needed */
 
+.checkbox {
+    appearance: none;
+    overflow: hidden;
+    width: 130px; /* Change width to 130px */
+    height: 30px; /* Change height to 30px */
+    aspect-ratio: 1/1;
+    border-radius: 100% 0% 100% 0% / 0% 100% 0% 100%;
+    border: 2px solid rgb(0, 102, 255); /* Change border color to blue */
+    position: relative;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .checkbox::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    font-size: 35px;
+    width: 100%; /* Adjust to fill the entire space */
+    height: 100%; /* Adjust to fill the entire space */
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .checkbox:checked {
+    border: 2px solid rgb(173, 216, 230); /* Change border color to a light blue */
+    background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
+    box-shadow: -2px -2px 20px rgba(173, 216, 230, 1), 2px 2px 20px rgba(0, 102, 255, 1); /* Adjust shadow colors and width */
+  }
+  
+  .checkbox:checked::before {
+    background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
+  }
+  

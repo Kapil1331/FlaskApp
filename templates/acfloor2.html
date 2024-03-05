@@ -1,27 +1,52 @@
 {% extends "layout.html" %}
 {% block title %}
-    Academic Complex Floor 1
+    Academic Complex Floor 1 - {{ current_day }}
 {% endblock %}
 {% block content %}
     <div class="rooms-container">
-        <!-- Room 101 Card -->
-        <div class="room-card cardWhite">
-            <h2>Room 201</h2>
-        </div>
-
-        <!-- Room 102 Card -->
-        <div class="room-card cardRed">
-            <h2>Room 202</h2>
-        </div>
-
-        <!-- Room 103 Card -->
-        <div class="room-card cardWhite">
-            <h2>Room 203</h2>
-        </div>
-
-        <!-- Room 104 Card -->
-        <div class="room-card cardWhite">
-            <h2>Room 204</h2>
-        </div>
+        {% if current_day %}
+        <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
+        <table class="availability-table">
+                <tr>
+                    <th>Time Slot</th>
+                    <th>Room 201</th>
+                    <th>Room 202</th>
+                    <th>Room 203</th>
+                    <th>Room 204</th>
+                </tr>
+                {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
+                {% for time_slot in time_slots %}
+                    <tr>
+                        <td>{{ time_slot }}</td>
+                        <td>
+                            {% set room_availability = get_room_availability('r201', current_day, time_slot, floor) %}
+                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
+                                <h2>Room 201 </h2>
+                            </div>
+                        </td>
+                        <td>
+                            {% set room_availability = get_room_availability('r202', current_day, time_slot, floor) %}
+                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
+                                <h2>Room 202 </h2>
+                            </div>
+                        </td>
+                        <td>
+                            {% set room_availability = get_room_availability('r203', current_day, time_slot, floor) %}
+                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
+                                <h2>Room 203 </h2>
+                            </div>
+                        </td>
+                        <td>
+                            {% set room_availability = get_room_availability('r204', current_day, time_slot, floor) %}
+                            <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
+                                <h2>Room 204 </h2>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No current day selected.</p>
+        {% endif %}
     </div>
 {% endblock %}
