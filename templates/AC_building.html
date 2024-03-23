@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}
+Academic Complex
+{% endblock %}
+{% block content %}
+<h1>Select The Floor</h1>
+
+<form class="form-venue" action="{{ url_for('selectacfloor') }}" method="GET">
+    <label for="venue">Choose a Floor:</label>
+    <select id="venue" name="venue">
+        <option value="1">Floor 1</option>
+        <option value="2">Floor 2</option>
+    </select>
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

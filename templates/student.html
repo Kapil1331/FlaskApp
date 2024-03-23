@@ -3,25 +3,39 @@
 Add New Student
 {% endblock %}
 {% block content %}
-        <form action="{{ url_for('addrec') }}" method="POST">
-            <h3>Please Add the New Student Information:</h3>
-            Username<br>
-            <input class="input" placeholder="Username" type="text" name="nm" /><br><br>
+        <form action="{{ url_for('addrec') }}" style="padding-top: 1%;" method="POST">
 
-            Address<br>
-            <input class="input" placeholder="Address" type="text" name="add" /><br><br>
+            <div class="container">
+            
+                <h3>Please enter the details below:</h3>
+            <br>
+            <label for="nm"><b>Username:</b></label><br>
+            <input class="input" placeholder="Enter username" type="text" name="nm" required/><br><br>
 
-            City<br>
+            <label for="add"><b>Address:</b></label><br>
+            <input class="input" placeholder="Enter address" type="text" name="add" /><br><br>
+
+            <label for="city"><b>Enter city:</b></label><br>
             <input class="input" placeholder="City" type="text" name="city" /><br><br>
-
-            Zip Code<br>
+            
+            <label for="zip"><b>Enter zip code:</b></label><br>
             <input class="input" placeholder="Zip Code" type="text" name="zip" /><br><br>
             
-            Password<br>
-            <input class="input" placeholder="Password" type="text" name="password" /><br>
+            <label for="password"><b>Enter password:</b></label><br>
+            <input class="input" placeholder="Password" type="password" name="password" required/><br><br>
+
+            <label for="cpsw"><b>Confirm password:</b></label><br>
+            <input  class="input" placeholder="Confirm password" type="password" name="cpsw" required/><br>
             
             <br>
-            <input class="input" placeholder="text" type="submit" value="Submit" /><br>
-            
+            <button type="submit"><b>Submit</b></button>
+
+        </div>
+            <br>
+        <div class="container">
+               Already have an account?
+               <a href="/login">Sign in</a> 
+        </div>
+
         </form>
 {% endblock %}

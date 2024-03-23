@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}
+    Select Venue
+{% endblock %}
+
+{% block content %}
+    <h1>Select The Venue</h1>
+
+    <form class="form-venue" action="{{ url_for('redirectvenue') }}" method="GET">
+        <label for="venue">Choose a Venue:</label>
+        <select id="venue" name="venue">
+            <option value="AC_building">Academic Complex Building</option>
+            <option value="Auditorium">Auditorium</option>
+            <option value="parking_slot">Parking Slot</option>
+        </select>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
