@@ -7,6 +7,8 @@
             {% if current_day %}
                 <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
                 <form action="{{ url_for('changeACdatabase') }}" method="post">
+                    <input type="hidden" name="dummy_variable" value="{{ current_day }}">
+                    <input type="hidden" name="dummy_variable2" value="1">
                     <table class="availability-table">
                         <tr>
                             <th>Time Slot</th>
