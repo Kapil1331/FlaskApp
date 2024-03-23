@@ -20,16 +20,16 @@
                         <tr>
                             <td>{{ time_slot }}</td>
                             <td>
-                                <input type="checkbox" class="checkbox" name="mycheckbox" value="1_{{ time_slot }}" {% if get_room_availability('r101', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                <input type="checkbox" class="checkbox" name="room_status_r101_{{ time_slot }}" value="{% if get_room_availability('r101', current_day, time_slot, floor) == 'Occupied' %}Occupied{% else %}Vacant{% endif %}" {% if get_room_availability('r101', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
                             </td>
                             <td>
-                                <input type="checkbox" class="checkbox" name="mycheckbox" value="2_{{ time_slot }}" {% if get_room_availability('r102', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                <input type="checkbox" class="checkbox" name="room_status_r102_{{ time_slot }}" value="{% if get_room_availability('r102', current_day, time_slot, floor) == 'Occupied' %}Occupied{% else %}Vacant{% endif %}" {% if get_room_availability('r102', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
                             </td>
                             <td>
-                                <input type="checkbox" class="checkbox" name="mycheckbox" value="3_{{ time_slot }}" {% if get_room_availability('r103', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                <input type="checkbox" class="checkbox" name="room_status_r103_{{ time_slot }}" value="{% if get_room_availability('r103', current_day, time_slot, floor) == 'Occupied' %}Occupied{% else %}Vacant{% endif %}" {% if get_room_availability('r103', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
                             </td>
                             <td>
-                                <input type="checkbox" class="checkbox" name="mycheckbox" value="4_{{ time_slot }}" {% if get_room_availability('r104', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                <input type="checkbox" class="checkbox" name="room_status_r104_{{ time_slot }}" value="{% if get_room_availability('r104', current_day, time_slot, floor) == 'Occupied' %}Occupied{% else %}Vacant{% endif %}" {% if get_room_availability('r104', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
                             </td>
                         </tr>
                     {% endfor %}
@@ -41,3 +41,4 @@
         {% endif %}
     </div>
 {% endblock %}
+

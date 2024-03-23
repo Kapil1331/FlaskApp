@@ -1,44 +1,43 @@
-{% extends "layout.html" %}
-{% block title %}
-    Academic Complex Floor 1 - {{ current_day }}
-{% endblock %}
-{% block content %}
-    <div class="rooms-container">
-        {% if current_day %}
-            <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
-            <table class="availability-table">
-                <tr>
-                    <th>Time Slot</th>
-                    <th>Room 101</th>
-                    <th>Room 102</th>
-                    <th>Room 103</th>
-                    <th>Room 104</th>
-                </tr>
-                {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
-                {% for time_slot in time_slots %}
-                    <tr>
-                        <td>{{ time_slot }}</td>
-                        <td>
-                            {% set room_availability = get_room_availability('r101', current_day, time_slot, floor) %}
-                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% else %}{% endif %}" >
-                        </td>
-                        <td>
-                            {% set room_availability = get_room_availability('r102', current_day, time_slot, floor) %}
-                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% endif %}" >
-                        </td>
-                        <td>
-                            {% set room_availability = get_room_availability('r103', current_day, time_slot, floor) %}
-                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% endif %}" >
-                        </td>
-                        <td>
-                            {% set room_availability = get_room_availability('r104', current_day, time_slot, floor) %}
-                            <input type="checkbox" class="checkbox {% if room_availability == 'Occupied' %}checked{% endif %}" >
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>No current day selected.</p>
-        {% endif %}
-    </div>
-{% endblock %}
+    {% extends "layout.html" %}
+    {% block title %}
+        Academic Complex Floor 1 - {{ current_day }}
+    {% endblock %}
+    {% block content %}
+        <div class="rooms-container">
+            {% if current_day %}
+                <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
+                <form action="{{ url_for('changeACdatabase') }}" method="post">
+                    <table class="availability-table">
+                        <tr>
+                            <th>Time Slot</th>
+                            <th>Room 101</th>
+                            <th>Room 102</th>
+                            <th>Room 103</th>
+                            <th>Room 104</th>
+                        </tr>
+                        {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
+                        {% for time_slot in time_slots %}
+                            <tr>
+                                <td>{{ time_slot }}</td>
+                                <td>
+                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="1_{{ time_slot }}" {% if get_room_availability('r101', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="2_{{ time_slot }}" {% if get_room_availability('r102', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="3_{{ time_slot }}" {% if get_room_availability('r103', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="4_{{ time_slot }}" {% if get_room_availability('r104', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <button type="submit" style="background-color: #ADD8E6; color: white; border-radius: 5px; padding: 10px 20px; border: none;">Submit Changes</button>
+                </form>
+            {% else %}
+                <p>No current day selected.</p>
+            {% endif %}
+        </div>
+    {% endblock %}
