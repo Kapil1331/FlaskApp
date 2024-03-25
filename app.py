@@ -181,8 +181,10 @@ def redirectvenue():
         return render_template('auditorium.html')
     elif selected_venue == 'parking_slot':
         return render_template('parking_slot.html')
-    elif selected_venue == 'AC_building':
-        return render_template('AC_building.html')
+    elif selected_venue == 'AC_building_1':
+        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+    elif selected_venue == 'AC_building_2':
+        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
     else: 
         return render_template('selectvenue.html')  
 
