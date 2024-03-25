@@ -181,8 +181,10 @@ def redirectvenue():
         return render_template('auditorium.html')
     elif selected_venue == 'parking_slot':
         return render_template('parking_slot.html')
-    elif selected_venue == 'AC_building':
-        return render_template('AC_building.html')
+    elif selected_venue == 'AC_building_1':
+        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+    elif selected_venue == 'AC_building_2':
+        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
     else: 
         return render_template('selectvenue.html')  
 
@@ -205,6 +207,20 @@ def get_room_availability(room_id, current_day, time_slot, floor):
     else:
         return None  # Return None if no availability is found
 
+def get_auditorium_seat_availability(seat_number, row_label, current_day):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    query = "SELECT status FROM mainAuditorium WHERE seat_number = ? AND row_label = ? AND day = ?"
+    cursor.execute(query, (seat_number, row_label, current_day))
+    
+    result = cursor.fetchone()
+    
+    if result:
+        availability = result[0]
+        return availability
+    else:
+        return None
 
 
 @app.route("/selectacfloor", methods=['POST','GET'])
@@ -218,10 +234,13 @@ def selectacfloor():
     else:
         return render_template('AC_building.html')
 
-@app.route("/editvenue", methods=['POST','GET'])
+@app.route("/editvenue", methods=['POST'])
 def editvenue():
-    selected_venue = request.args.get('venue')
-    current_day = datetime.now().strftime('%A')
+    selected_venue = request.form.get('venue')
+    current_day = request.form.get('day')
+    print(selected_venue)
+    print(current_day)
+    # current_day = datetime.now().strftime('%A')    
     if selected_venue == 'Auditorium':
         return render_template('editauditorium.html')
     elif selected_venue == 'parking_slot':
@@ -232,41 +251,17 @@ def editvenue():
         return render_template('editAC_floor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
     else: 
         return render_template('selectvenue.html')
-        
-
-# @app.route("/changeACdatabase", methods=['POST'])
-# def changeACdatabase():
-#     selected_venue = request.args.get('venue')
-#     current_day = datetime.now().strftime('%A')
-#     if request.method == 'POST':
-#         room_statuses = request.form.getlist('room_status')
-
-#         room_ids = ['r101', 'r102', 'r103', 'r104']
-
-#         time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm']
-
-#         index = 0  
-#         print(len(room_statuses))
-#         print(len(time_slots))
-#         print(len(room_ids))
-#         for time_slot in time_slots:
-#             for room_id in room_ids:
-#                 status = room_statuses[index]
-#                 update_room_status(room_id, current_day, time_slot, 1, status)
-#                 # if(index < 36):
-#                     #inde'Occupied' x += 1
-
-#         return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
-
-#     return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+    
 
 def update_room_status(room_id, current_day, time_slot, floor, status):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-
-    query = f"UPDATE acFloor1 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
-    cursor.execute(query, (status, current_day, time_slot))
-
+    if(floor == 1) :
+        query = f"UPDATE acFloor1 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
+        cursor.execute(query, (status, current_day, time_slot))
+    else :
+        query = f"UPDATE acFloor2 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
+        cursor.execute(query, (status, current_day, time_slot))       
     conn.commit()
     conn.close()
 
@@ -276,54 +271,83 @@ def changeACdatabase():
     current_day = datetime.now().strftime('%A')
     if request.method == 'POST':
         room_statuses = request.form.getlist('mycheckbox')
-        # print(room_statuses)
-        # room_statuses_dict = {}
-        # i = 0
+        selected_day = request.form.get('dummy_variable')
+        selected_floor = request.form.get('dummy_variable2')
+        print(selected_floor)
         arr = [[0] * 4 for _ in range(9)]
-        for item in room_statuses:
-            # i += 1
-            room_number, time_slot = item.split('_')
-            room_id = 'r' + str(int(room_number) + 100)
-            time_parts = time_slot.split('-')
-            start_time = time_parts[0]
-            first_number = int(start_time.split('am')[0]) if 'am' in start_time else int(start_time.split('pm')[0])
-             
-            if 'pm' in start_time and first_number != 12:  # Adjusting for 'pm' and 12pm
-                first_number += 12     
-            arr[first_number - 9][int(room_number)-1] = 1            
-            status = 'Occupied'
-            update_room_status(room_id, current_day, time_slot, 1, status)
-        print(arr)
+        if(selected_floor == 1) :    
+            for item in room_statuses:
+                room_number, time_slot = item.split('_')
+                room_id = 'r' + str(int(room_number) + 100)
+                time_parts = time_slot.split('-')
+                start_time = time_parts[0]
+                first_number = int(start_time.split('am')[0]) if 'am' in start_time else int(start_time.split('pm')[0])
+                
+                if 'pm' in start_time and first_number != 12:  # Adjusting for 'pm' and 12pm
+                    first_number += 12     
+                arr[first_number - 9][int(room_number)-1] = 1            
+                status = 'Occupied'
+                update_room_status(room_id, selected_day, time_slot, 1, status)        
+            for row_index, row in enumerate(arr):
+                for col_index, element in enumerate(row):
+                    if element == 0:
+                        # Reconstruct time slot based on row_index
+                        start_hour = row_index + 9
+                        end_hour = start_hour + 1
+                        
+                        # Adjust time format for 'am' and 'pm' transitions
+                        start_ampm = 'am' if start_hour < 12 else 'pm'
+                        start_hour = start_hour % 12 if start_hour % 12 != 0 else 12
+                        start_time = f"{start_hour}{start_ampm}"
+                        
+                        end_ampm = 'am' if end_hour < 12 else 'pm'
+                        end_hour = end_hour % 12 if end_hour % 12 != 0 else 12
+                        end_time = f"{end_hour}{end_ampm}"
+                        
+                        time_slot = f"{start_time}-{end_time}"
+                        
+                        room_number = col_index + 1  # Add 1 to convert back to room number
+                        room_id = 'r' + str(room_number + 100)  # Construct room ID
+                        update_room_status(room_id, selected_day, time_slot, 1, 'Vacant')
+                        # update_room_status(room_id, selected_day, time_slot, 1, 'Vacant')
+
         
-        for row_index, row in enumerate(arr):
-            for col_index, element in enumerate(row):
-                if element == 0:
-                    # Reconstruct time slot based on row_index
-                    start_hour = row_index + 9
-                    end_hour = start_hour + 1
-                    
-                    # Adjust time format for 'am' and 'pm' transitions
-                    start_ampm = 'am' if start_hour < 12 else 'pm'
-                    start_hour = start_hour % 12 if start_hour % 12 != 0 else 12
-                    start_time = f"{start_hour}{start_ampm}"
-                    
-                    end_ampm = 'am' if end_hour < 12 else 'pm'
-                    end_hour = end_hour % 12 if end_hour % 12 != 0 else 12
-                    end_time = f"{end_hour}{end_ampm}"
-                    
-                    time_slot = f"{start_time}-{end_time}"
-                    
-                    room_number = col_index + 1  # Add 1 to convert back to room number
-                    room_id = 'r' + str(room_number + 100)  # Construct room ID
-                    update_room_status(room_id, current_day, time_slot, 1, 'Vacant')
+            return render_template('editAC_floor1.html', current_day=selected_day, get_room_availability=get_room_availability, floor=1)
+        else :
+            for item in room_statuses:
+                room_number, time_slot = item.split('_')
+                room_id = 'r' + str(int(room_number) + 200)
+                time_parts = time_slot.split('-')
+                start_time = time_parts[0]
+                first_number = int(start_time.split('am')[0]) if 'am' in start_time else int(start_time.split('pm')[0])
+                
+                if 'pm' in start_time and first_number != 12:  # Adjusting for 'pm' and 12pm
+                    first_number += 12     
+                arr[first_number - 9][int(room_number)-1] = 1            
+                status = 'Occupied'
+                update_room_status(room_id, selected_day, time_slot, 2, status)        
+            for row_index, row in enumerate(arr):
+                for col_index, element in enumerate(row):
+                    if element == 0:
+                        # Reconstruct time slot based on row_index
+                        start_hour = row_index + 9
+                        end_hour = start_hour + 1
+                        
+                        # Adjust time format for 'am' and 'pm' transitions
+                        start_ampm = 'am' if start_hour < 12 else 'pm'
+                        start_hour = start_hour % 12 if start_hour % 12 != 0 else 12
+                        start_time = f"{start_hour}{start_ampm}"
+                        
+                        end_ampm = 'am' if end_hour < 12 else 'pm'
+                        end_hour = end_hour % 12 if end_hour % 12 != 0 else 12
+                        end_time = f"{end_hour}{end_ampm}"
+                        
+                        time_slot = f"{start_time}-{end_time}"
+                        
+                        room_number = col_index + 1  # Add 1 to convert back to room number
+                        room_id = 'r' + str(room_number + 200)  # Construct room ID
+                        update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
+                        # update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
 
-
-                    update_room_status(room_id, current_day, time_slot, 1, 'Vacant')
-
-
-
-        # print(i)
-    
-        return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
-
-    return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+        
+            return render_template('editAC_floor2.html', current_day=selected_day, get_room_availability=get_room_availability, floor=2)            
