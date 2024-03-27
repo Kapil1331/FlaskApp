@@ -1,41 +1,220 @@
+<style>
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    position: relative;
+    margin: auto; 
+    margin-top: 10vh;
+  }
+  
+  .title {
+    font-size: 28px;
+    color: royalblue;
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+  }
+  
+  .title::before,.title::after {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    left: 0px;
+    background-color: royalblue;
+  }
+  
+  .title::before {
+    width: 18px;
+    height: 18px;
+    background-color: royalblue;
+  }
+  
+  .title::after {
+    width: 18px;
+    height: 18px;
+    animation: pulse 1s linear infinite;
+  }
+  
+  .message, .signin {
+    color: rgba(88, 87, 87, 0.822);
+    font-size: 14px;
+  }
+  
+  .signin {
+    text-align: center;
+  }
+  
+  .signin a {
+    color: royalblue;
+  }
+  
+  .signin a:hover {
+    text-decoration: underline royalblue;
+  }
+  
+  .flex {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+  }
+  
+  .form label {
+    position: relative;
+  }
+  
+  .form label .input {
+    width: 100%;
+    padding: 15px 10px 20px 10px;
+    outline: 0;
+    border: 1px solid rgba(105, 105, 105, 0.397);
+    border-radius: 10px;
+  }
+  
+  .form label .input + span {
+    position: absolute;
+    left: 10px;
+    top: 15px;
+    color: grey;
+    font-size: 0.9em;
+    cursor: text;
+    transition: 0.3s ease;
+  }
+  
+  .form label .input:placeholder-shown + span {
+    top: 15px;
+    font-size: 0.9em;
+  }
+  
+  .form label .input:focus + span,.form label .input:valid + span {
+    top: 30px;
+    font-size: 0.7em;
+    font-weight: 600;
+  }
+  
+  .form label .input:valid + span {
+    color: green;
+  }
+  
+  .submit {
+    border: none;
+    outline: none;
+    background-color: royalblue;
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    transform: .3s ease;
+    margin: 0 auto;
+  }
+  
+  .submit:hover {
+    background-color: rgb(56, 90, 194);
+  }
+  
+  @keyframes pulse {
+    from {
+      transform: scale(0.9);
+      opacity: 1;
+    }
+  
+    to {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+  .error-message {
+    color: rgb(255, 0, 0);
+}
+</style>
+
 {% extends "layout.html" %}
 {% block title %}
 Add New Student
 {% endblock %}
 {% block content %}
-        <form action="{{ url_for('addrec') }}" style="padding-top: 1%;" method="POST">
 
-            <div class="container">
+<form class="form" action="{{ url_for('addrec') }}" method="POST">
+    <p class="title">Register </p>
+    {% if error %}
+        <p class="error-message">{{ error }}</p>
+    {% endif %}
+    <p class="message">Signup now and get full access to our services. </p>
+        <div class="flex">
+        <label>
+            <input required="" placeholder="" type="text" class="input" name="username1">
+            <span>Firstname</span>
+        </label>
+
+        <label>
+            <input required="" placeholder="" type="text" class="input" name="username2">
+            <span>Lastname</span>
+        </label>
+    </div>  
             
-                <h3>Please enter the details below:</h3>
-            <br>
-            <label for="nm"><b>Username:</b></label><br>
-            <input class="input" placeholder="Enter username" type="text" name="nm" required/><br><br>
+    <label>
+        <input required="" placeholder="" type="email" class="input" name="email">
+        <span>Email</span>
+    </label> 
+        
+    <label>
+        <input required="" placeholder="" type="password" class="input" name="password">
+        <span>Password</span>
+    </label>
+    <label>
+        <input required="" placeholder="" type="password" class="input" name="cpassword">
+        <span>Confirm password</span>
+    </label>
+    <button class="submit">Submit</button>
+    <p class="signin">Already have an acount ? <a href="/login">Signin</a> </p>
+</form>
 
-            <label for="add"><b>Address:</b></label><br>
-            <input class="input" placeholder="Enter address" type="text" name="add" /><br><br>
-
-            <label for="city"><b>Enter city:</b></label><br>
-            <input class="input" placeholder="City" type="text" name="city" /><br><br>
-            
-            <label for="zip"><b>Enter zip code:</b></label><br>
-            <input class="input" placeholder="Zip Code" type="text" name="zip" /><br><br>
-            
-            <label for="password"><b>Enter password:</b></label><br>
-            <input class="input" placeholder="Password" type="password" name="password" required/><br><br>
-
-            <label for="cpsw"><b>Confirm password:</b></label><br>
-            <input  class="input" placeholder="Confirm password" type="password" name="cpsw" required/><br>
-            
-            <br>
-            <button type="submit"><b>Submit</b></button>
-
-        </div>
-            <br>
-        <div class="container">
-               Already have an account?
-               <a href="/login">Sign in</a> 
-        </div>
-
-        </form>
 {% endblock %}
+
+
+
+
+<!-- <form action="{{ url_for('addrec') }}" style="padding-top: 1%;" method="POST">
+
+    <div class="container">
+    
+        <h3>Please enter the details below:</h3>
+    <br>
+    <label for="nm"><b>Username:</b></label><br>
+    <input class="input" placeholder="Enter username" type="text" name="nm" required/><br><br>
+
+    <label for="add"><b>Address:</b></label><br>
+    <input class="input" placeholder="Enter address" type="text" name="add" /><br><br>
+
+    <label for="city"><b>Enter city:</b></label><br>
+    <input class="input" placeholder="City" type="text" name="city" /><br><br>
+    
+    <label for="zip"><b>Enter zip code:</b></label><br>
+    <input class="input" placeholder="Zip Code" type="text" name="zip" /><br><br>
+    
+    <label for="password"><b>Enter password:</b></label><br>
+    <input class="input" placeholder="Password" type="password" name="password" required/><br><br>
+
+    <label for="cpsw"><b>Confirm password:</b></label><br>
+    <input  class="input" placeholder="Confirm password" type="password" name="cpsw" required/><br>
+    
+    <br>
+    <button type="submit"><b>Submit</b></button>
+
+</div>
+    <br>
+<div class="container">
+       Already have an account?
+       <a href="/login">Sign in</a> 
+</div>
+
+</form> -->

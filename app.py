@@ -29,28 +29,41 @@ def login():
 def authenticate():
     if request.method == 'POST':
         # Retrieve form data
-        username = request.form['username']
+        firstname = request.form['username1']
+        lastname = request.form['username2']
         password = request.form['password']
 
         # Connect to the database
         conn = sqlite3.connect('database.db')
-
-        # Check if the username and password match a record in the database
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM students WHERE name=? AND password=?', (username, password))
+        cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname,lastname))
         user = cursor.fetchone()
-        if(username == 'cap' and password == admin_password):
-            return render_template('adminlogin.html')            
-        else:
-            if user:
-                # Successful authentication, redirect to selectvenue.html
-                conn.close()
-                return render_template('selectvenue.html')
-            else:
-                # Authentication failed, render login.html with an error message
-                conn.close()
-                return render_template("login.html", error="Invalid username or password")
 
+        if(user):            
+            # Check if the username and password match a record in the database
+            conn = sqlite3.connect('database.db')
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=?', (firstname,lastname,password))
+            userandpass = cursor.fetchone()
+
+            if(firstname == 'cap' and lastname == 'T' and password == admin_password):
+                return render_template('adminlogin.html')            
+            else:
+                if userandpass:
+                    # Successful authentication, redirect to selectvenue.html
+                    print("Successful authentication")
+                    conn.close()
+                    return render_template('selectvenue.html')
+                else:
+                    # Authentication failed, render login.html with an error message
+                    print("Authentication failed")
+                    conn.close()
+                    return render_template("login.html", error="Incorrect password. Please try again.")
+        
+        else:
+            conn.close()
+            return render_template("student.html", error="The user dose not exist. Please register")
+        
     else:
             return render_template("login.html")
 
@@ -61,19 +74,21 @@ def addrec():
     # Data will be available from POST submitted by the form
     if request.method == 'POST':
         try:
-            nm = request.form['nm']
-            addr = request.form['add']
-            city = request.form['city']
-            zip = request.form['zip']
+            firstname = request.form['username1']
+            lastname = request.form['username2']
+            email = request.form['email']
             password = request.form['password']
-
-            # Connect to SQLite3 database and execute the INSERT
+            cpassword = request.form['cpassword']
+            # print(firstname)
+            # print(lastname)
+            # print(email)
+            # print(password)
             with sqlite3.connect('database.db') as con:
                 cur = con.cursor()
-                cur.execute("INSERT INTO students (name, addr, city, zip, password) VALUES (?,?,?,?,?)",(nm, addr, city, zip, password))
+                cur.execute("INSERT INTO students2 (firstname, lastname, email, password) VALUES (?,?,?,?)", (firstname, lastname, email, password))
 
                 con.commit()
-                msg = "Record successfully added to database"
+                msg = "You have successfully created an account. Please proceed to login."
         except:
             con.rollback()
             msg = "Error in the INSERT"
@@ -81,7 +96,7 @@ def addrec():
         finally:
             con.close()
             # Send the transaction message to result.html
-            return render_template('result.html',msg=msg)
+            return render_template('login.html',msg=msg)
 
 # Route to SELECT all data from the database and display in a table      
 @app.route('/list')
@@ -172,7 +187,10 @@ def delete():
             con.close()
             return render_template('result.html',msg=msg)
 
-
+@app.route("/redirect", methods=['POST','GET'])
+def redirect():
+    return render_template('adminlogin.html')
+    
 @app.route("/redirectvenue", methods=['POST','GET'])
 def redirectvenue():
     current_day = datetime.now().strftime('%A') 
@@ -241,6 +259,9 @@ def editvenue():
     current_day = request.form.get('day')
     print(selected_venue)
     print(current_day)
+    if selected_venue is None or current_day is None:
+        return render_template('adminlogin.html', error = "Invalid input please select again")
+    
     # current_day = datetime.now().strftime('%A')    
     if selected_venue == 'Auditorium':
         return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=get_auditorium_seat_availability)

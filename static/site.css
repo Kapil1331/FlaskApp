@@ -1,60 +1,3 @@
-.navbar {
-    background-color: lightslategray;
-    font-size: 1em;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    color: white;
-    padding: 8px 5px 8px 5px;
-}
-
-.navbar a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.navbar-brand {
-    font-size: 1.2em;
-    font-weight: 600;
-}
-
-.navbar-item {
-    font-variant: small-caps;
-    margin-left: 30px;
-}
-
-.body-content {
-    padding: 5px;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-body {
-    min-height: 100vh;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-}
-  
-footer {
-    margin-top: auto;
-    background-color: lightslategray;
-    color: white;
-    text-align: center;
-    padding: 8px 5px;
-}
-
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;  /* Center-align items horizontally */
-    justify-content: center;  /* Center-align items vertically */
-}
-
-.footer-content img {
-    margin-bottom: -20px;  /* Add some space between the logo and the text */
-}
 
 .container{
     text-align: center;
@@ -158,6 +101,7 @@ input[type='password'] {
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .form-venue label {
@@ -175,6 +119,24 @@ input[type='password'] {
     box-sizing: border-box;
 }
 
+.form-venue {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /* background: repeating-linear-gradient(45deg, #9cbcff,#9cbcff 20px, #b3daffde 20px,#b3daffde 40px); */
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Other styles for the form */
+
+
+.form-venue h1 {
+    text-align: center;
+}
 .form-venue input[type="submit"] {
     background-color: #007BFF;
     color: #fff;
@@ -183,44 +145,13 @@ input[type='password'] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.form-venue h1 {
-    text-align: center;
+.form-venue input[type="submit"]:hover {
+    background-color: #0056b3;
 }
 
-
-.checkbox {
-    appearance: none;
-    overflow: hidden;
-    width: 130px; /* Change width to 130px */
-    height: 30px; /* Change height to 30px */
-    aspect-ratio: 1/1;
-    border-radius: 100% 0% 100% 0% / 0% 100% 0% 100%;
-    border: 2px solid rgb(0, 102, 255); /* Change border color to blue */
-    position: relative;
-    transition: all 0.2s ease-in-out;
-}
-  
-.checkbox::before {
-position: absolute;
-inset: 0;
-content: "";
-font-size: 35px;
-width: 100%; /* Adjust to fill the entire space */
-height: 100%; /* Adjust to fill the entire space */
-transition: all 0.2s ease-in-out;
-}
-
-.checkbox:checked {
-border: 2px solid rgb(173, 216, 230); /* Change border color to a light blue */
-background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
-box-shadow: -2px -2px 20px rgba(173, 216, 230, 1), 2px 2px 20px rgba(0, 102, 255, 1); /* Adjust shadow colors and width */
-}
-
-.checkbox:checked::before {
-background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
-}
 
 button {
     background-color: white;
@@ -230,6 +161,9 @@ button {
     border: none;
     cursor: pointer;
     width: 40%;
+    display: block; /* Change the display property to block */
+    margin-left: auto; /* Set margin-left to auto */
+    margin-right: auto; /* Set margin-right to auto */
 }
 
 button:hover {
@@ -289,43 +223,4 @@ button:hover {
 
 .clear {
     clear: both;
-}
-  
-.checkBoxAudi {
-display: block;
-cursor: pointer;
-width: 30px;
-height: 30px;
-border: 3px solid #6AD4DD; 
-border-radius: 10px;
-position: relative;
-overflow: hidden;
-box-shadow: 0px 0px 0px 2px #fff;
-}
-
-.checkBoxAudi div {
-width: 60px;
-height: 60px;
-background-color: #fff;
-top: -52px;
-left: -52px;
-position: absolute;
-transform: rotateZ(45deg);
-z-index: 100;
-}
-
-.checkBoxAudi input[type=checkbox]:checked + div {
-left: -10px;
-top: -10px;
-background-color: #6AD4DD;
-}
-
-.checkBoxAudi input[type=checkbox] {
-position: absolute;
-left: 50px;
-visibility: hidden;
-}
-
-.transition {
-transition: 300ms ease;
 }

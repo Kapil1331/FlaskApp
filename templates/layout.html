@@ -4,13 +4,18 @@
         <meta charset="utf-8" />
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fandh.css')}}" />
     </head>
 
     <body>
         <div class="navbar">
             <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
-            <a href="{{ url_for('login') }}" class="navbar-item">Login/Register</a>
-            <a href="{{ url_for('list') }}" class="navbar-item">Review and Edit Students</a>
+            <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
+            <a href="{{ url_for('enternew') }}" class="navbar-item">Register</a>
+            <a href="https://www.coeptech.ac.in/" class="navbar-item">COEP Tech</a>
+            <a href="http://portal.coep.org.in:9093/" class="navbar-item">MIS</a>
+            <a href="https://moodle.coep.org.in/moodle/login/index.php" class="navbar-item">Moodle</a>
+            <!-- <a href="{{ url_for('list') }}" class="navbar-item">Review and Edit Students</a> -->
         </div>
 
         <div class="body-content">
@@ -20,7 +25,17 @@
         </div>
         <footer>
             <div class="footer-content">
-                <p><img src="{{ url_for('static', filename='logo.png')}}" width="60" height="60">&copy; 2024</p>
+                <!-- <p><img src="{{ url_for('static', filename='logo.png')}}" width="60" height="60">&copy; 2024</p> -->
+                <div class="top-content">
+                    <a href="#" class="footer-link">Home</a>
+                    <a href="#" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Services</a>
+                    <a href="#" class="footer-link">Team</a>
+                    <a href="#" class="footer-link">Contact</a> 
+                </div>
+                <div class="bottom-content">
+                    <p>&copy;2024 COEP Tech | All Rights Reserved</p>
+                </div>
             </div>
         </footer>
         

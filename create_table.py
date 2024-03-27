@@ -8,6 +8,8 @@ print("Connected to database successfully")
 conn.execute('CREATE TABLE IF NOT EXISTS students (name TEXT, addr TEXT, city TEXT, zip TEXT, password TEXT)')
 print("Created table successfully!")
 
+conn.execute('CREATE TABLE IF NOT EXISTS students2 (firstname TEXT, lastname TEXT, email TEXT, password TEXT)')
+print("Created table successfully!")
 
 # Create table for AC floor 1
 conn.execute('CREATE TABLE IF NOT EXISTS acFloor1 (day TEXT, time_slot TEXT, r101 TEXT, r102 TEXT, r103 TEXT, r104 TEXT)')
