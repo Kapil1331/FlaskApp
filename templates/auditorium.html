@@ -3,35 +3,28 @@
     Academic Complex Floor 1 - {{ current_day }}
 {% endblock %}
 {% block content %}
-    <div class="rooms-container">
-        {% if current_day %}
-            <h2 style="text-align: center;">Availability for {{ current_day }}</h2>
-            <table class="availability-table">
-                <tr>
-                    <th style="text-align: center;"><h3>Time Slot</h3></th>
-                    {% set room_numbers = ['101', '102', '103', '104'] %}
-                    {% for room_number in room_numbers %}
-                        <th style="text-align: center;"><h3>Room {{ room_number }}</h3></th>
-                    {% endfor %}
-                </tr>
-                {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
-                {% for time_slot in time_slots %}
-                    <tr>
-                        <td align="center">{{ time_slot }}</td>
-                        {% for room_number in room_numbers %}
-                            <td align="center">
-                                {% set room_id = 'r' + room_number %}
-                                {% set room_availability = get_room_availability(room_id, current_day, time_slot, floor) %}
-                                <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
-                                    <h2 style="text-align: center;">Room {{ room_number }}</h2>
-                                </div>
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>No current day selected.</p>
-        {% endif %}
+<div class="seat-container">
+    <div style="width: 100%; text-align: center;">
+        <h2>Availability for {{ current_day }}</h2>
     </div>
+    {% set total_rows = 25 %}
+    {% set total_seats_per_row = 32 %}
+    {% for row_num in range(1, total_rows + 1) %}
+        <div class="seat-row">
+            <div class="seat-label">Row {{ row_num }}</div>
+            {% for seat_num in range(1, total_seats_per_row + 1) %}
+                {% if seat_num == 7 or seat_num == 27 %}
+                    <div class="passage"></div>
+                {% endif %}
+                <div class="passage2"></div>
+                {% set seat_availability = get_auditorium_seat_availability(seat_num, row_num, current_day) %}
+                <div class="seat {% if seat_availability == 'Occupied' %}selected{% endif %}">
+                    {% if seat_availability == 'Vacant' %}
+                        <span class="seat-number">{{ seat_num }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

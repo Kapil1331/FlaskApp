@@ -170,15 +170,15 @@ def delete():
 
         finally:
             con.close()
-            # Send the transaction message to result.html
             return render_template('result.html',msg=msg)
 
 
 @app.route("/redirectvenue", methods=['POST','GET'])
 def redirectvenue():
+    current_day = datetime.now().strftime('%A') 
     selected_venue = request.args.get('venue')
     if selected_venue == 'Auditorium':
-        return render_template('auditorium.html')
+        return render_template('auditorium.html',current_day=current_day, get_auditorium_seat_availability = get_auditorium_seat_availability)
     elif selected_venue == 'parking_slot':
         return render_template('parking_slot.html')
     elif selected_venue == 'AC_building_1':
@@ -192,14 +192,12 @@ def get_room_availability(room_id, current_day, time_slot, floor):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
-    # Choose the appropriate table based on the floor
     table_name = f'acFloor{floor}'
     
-    # Use a prepared statement to prevent SQL injection
     query = f"SELECT {room_id} FROM {table_name} WHERE day = ? AND time_slot = ? AND {room_id} IS NOT NULL"
     cursor.execute(query, (current_day, time_slot))
     
-    result = cursor.fetchone()  # Fetch a single row since we're looking for a specific time_slot
+    result = cursor.fetchone()
     
     if result:
         availability = result[0]
@@ -210,6 +208,9 @@ def get_room_availability(room_id, current_day, time_slot, floor):
 def get_auditorium_seat_availability(seat_number, row_label, current_day):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
+    
+    row_label = chr(ord('a') + row_label - 1) # converts numbers to alphabets
+    # seat_number = seat_number + 32 * (ord(row_label.lower()) - ord('a')) 
 
     query = "SELECT status FROM mainAuditorium WHERE seat_number = ? AND row_label = ? AND day = ?"
     cursor.execute(query, (seat_number, row_label, current_day))
@@ -242,7 +243,7 @@ def editvenue():
     print(current_day)
     # current_day = datetime.now().strftime('%A')    
     if selected_venue == 'Auditorium':
-        return render_template('editauditorium.html')
+        return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=get_auditorium_seat_availability)
     elif selected_venue == 'parking_slot':
         return render_template('editparking_slot.html')
     elif selected_venue == 'AC_floor1':
@@ -259,7 +260,7 @@ def update_room_status(room_id, current_day, time_slot, floor, status):
     if(floor == 1) :
         query = f"UPDATE acFloor1 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
         cursor.execute(query, (status, current_day, time_slot))
-    else :
+    elif(floor == 2):
         query = f"UPDATE acFloor2 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
         cursor.execute(query, (status, current_day, time_slot))       
     conn.commit()
@@ -267,15 +268,16 @@ def update_room_status(room_id, current_day, time_slot, floor, status):
 
 @app.route("/changeACdatabase", methods=['POST'])
 def changeACdatabase():
-    selected_venue = request.args.get('venue')
-    current_day = datetime.now().strftime('%A')
+    # selected_venue = request.args.get('venue')
+    # current_day = datetime.now().strftime('%A')
     if request.method == 'POST':
         room_statuses = request.form.getlist('mycheckbox')
         selected_day = request.form.get('dummy_variable')
         selected_floor = request.form.get('dummy_variable2')
         print(selected_floor)
         arr = [[0] * 4 for _ in range(9)]
-        if(selected_floor == 1) :    
+        
+        if(selected_floor == "1"):    
             for item in room_statuses:
                 room_number, time_slot = item.split('_')
                 room_id = 'r' + str(int(room_number) + 100)
@@ -313,7 +315,7 @@ def changeACdatabase():
 
         
             return render_template('editAC_floor1.html', current_day=selected_day, get_room_availability=get_room_availability, floor=1)
-        else :
+        else:
             for item in room_statuses:
                 room_number, time_slot = item.split('_')
                 room_id = 'r' + str(int(room_number) + 200)
@@ -348,6 +350,44 @@ def changeACdatabase():
                         room_id = 'r' + str(room_number + 200)  # Construct room ID
                         update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
                         # update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
+            return render_template('editAC_floor2.html', current_day=selected_day, get_room_availability=get_room_availability, floor=2)
 
+def update_seat_status(seat_num, row_label, current_day, status):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    # Adjust seat number based on the row_label
+    # row_label_numeric = ord(row_label.lower()) - ord('a') + 1
+    # seat_num_adjusted = seat_num + 32 * (row_label_numeric - 1)
+
+    query = f"UPDATE mainAuditorium SET status = ? WHERE day = ? AND row_label = ? AND seat_number = ?"
+    cursor.execute(query, (status, current_day, row_label, seat_num))
+
+    conn.commit()
+    conn.close()
+
+@app.route("/changeAudidatabase", methods=['POST'])
+def changeAudidatabase():
+    if request.method == 'POST':
+        seat_statuses = request.form.getlist('mycheckbox') # only contains the entries of the filled seats
+        current_day = request.form.get('dummy_variable')
+        print(seat_statuses)
+        arr = [[0] * 32 for _ in range(25)]
         
-            return render_template('editAC_floor2.html', current_day=selected_day, get_room_availability=get_room_availability, floor=2)            
+        for item in seat_statuses:
+            status = 'Occupied'
+            seat_num, row_num = item.split('_')
+            row_label = chr(ord('a') + int(row_num) - 1)
+            arr[int(row_num) - 1][int(seat_num) - 1] = 1
+            update_seat_status(seat_num, row_label, current_day, status)
+        print(arr)
+        for row_index, row in enumerate(arr):
+            for col_index, element in enumerate(row):
+                if element == 0:
+                    status = 'Vacant'
+                    row_label = chr(row_index + ord('a'))
+                    seat_num = col_index + 1
+                update_seat_status(seat_num, row_label, current_day, status)
+            
+    
+        return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=get_auditorium_seat_availability)

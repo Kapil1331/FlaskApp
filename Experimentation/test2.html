@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theater Seat Selection</title>
+<style>
+    /* CSS styling for theater seats */
+    .seat {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        background-color: #e6e6e6; /* Default background color */
+        border: 1px solid #ccc; /* Border */
+        border-radius: 5px; /* Rounded corners */
+        margin: 5px; /* Margin around each seat */
+        cursor: pointer; /* Change cursor to pointer */
+    }
+
+    .seat.selected {
+        background-color: #007bff; /* Background color when seat is selected */
+        border-color: #0056b3; /* Border color when seat is selected */
+        color: #fff; /* Text color when seat is selected */
+    }
+</style>
+</head>
+<body>
+    <h1>Theater Seat Selection</h1>
+    <p>Select your seats:</p>
+    <div class="seat"></div>
+    <div class="seat selected"></div>
+    <div class="seat"></div>
+    <div class="seat"></div>
+    <div class="seat selected"></div>
+    <!-- Add more seats as needed -->
+</body>
+</html>

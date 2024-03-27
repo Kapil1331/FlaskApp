@@ -24,6 +24,9 @@
 .body-content {
     padding: 5px;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 body {
@@ -231,4 +234,98 @@ button {
 
 button:hover {
    opacity: 0.9;
+}
+
+.seat {
+    position: relative; /* Position relative for absolute positioning of seat number */
+    width: 30px;
+    height: 30px;
+    background-color: #e6e6e6;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.seat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.seat-number {
+    position: absolute; /* Position seat number */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Centering */
+    font-size: 12px; /* Adjust font size */
+}
+
+.seat-label {
+    margin-right: 10px;
+}
+
+.seat:hover {
+    background-color: #d9d9d9; /* Change background color on hover */
+}
+
+.seat.selected {
+    background-color: #007bff; /* Background color when seat is selected */
+    border-color: #0056b3; /* Border color when seat is selected */
+    color: #fff; /* Text color when seat is selected */
+}
+
+.passage {
+    width: 50px; /* Adjust width as needed */
+    flex: 0 0 auto;
+}
+
+.passage2 {
+    width: 5px; /* Adjust width as needed */
+    flex: 0 0 auto;
+}
+
+.clear {
+    clear: both;
+}
+  
+.checkBoxAudi {
+display: block;
+cursor: pointer;
+width: 30px;
+height: 30px;
+border: 3px solid #6AD4DD; 
+border-radius: 10px;
+position: relative;
+overflow: hidden;
+box-shadow: 0px 0px 0px 2px #fff;
+}
+
+.checkBoxAudi div {
+width: 60px;
+height: 60px;
+background-color: #fff;
+top: -52px;
+left: -52px;
+position: absolute;
+transform: rotateZ(45deg);
+z-index: 100;
+}
+
+.checkBoxAudi input[type=checkbox]:checked + div {
+left: -10px;
+top: -10px;
+background-color: #6AD4DD;
+}
+
+.checkBoxAudi input[type=checkbox] {
+position: absolute;
+left: 50px;
+visibility: hidden;
+}
+
+.transition {
+transition: 300ms ease;
 }
