@@ -1,6 +1,6 @@
 <style>
 .seat {
-    position: relative; /* Position relative for absolute positioning of seat number */
+    position: relative; 
     width: 30px;
     height: 30px;
     background-color: #e6e6e6;
@@ -22,11 +22,11 @@
 }
 
 .seat-number {
-    position: absolute; /* Position seat number */
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Centering */
-    font-size: 12px; /* Adjust font size */
+    position: absolute; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    font-size: 12px; 
 }
 
 .seat-label {
@@ -37,22 +37,22 @@
 }
 
 .seat:hover {
-    background-color: #d9d9d9; /* Change background color on hover */
+    background-color: #d9d9d9;
 }
 
 .seat.selected {
-    background-color: #007bff; /* Background color when seat is selected */
-    border-color: #0056b3; /* Border color when seat is selected */
-    color: #fff; /* Text color when seat is selected */
+    background-color: #007bff; 
+    border-color: #0056b3;
+    color: #fff; 
 }
 
 .passage {
-    width: 50px; /* Adjust width as needed */
+    width: 50px; 
     flex: 0 0 auto;
 }
 
 .passage2 {
-    width: 5px; /* Adjust width as needed */
+    width: 5px;
     flex: 0 0 auto;
 }
 
@@ -69,7 +69,7 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0px 0px 0px 2px #fff;
-    justify-content: center; /* Center horizontally */
+    justify-content: center; 
     align-items: center;
     display: flex; 
 }
@@ -100,6 +100,19 @@ visibility: hidden;
 .transition {
 transition: 300ms ease;
 }
+
+.top-columns {
+    display: flexbox; 
+}
+
+
+.row_head {
+    /* border: none; */
+    border-color: rgb(189, 189, 189);
+    font-weight: 900;
+    font-size: large;
+}
+
 </style>
 {% extends "layout.html" %}
 {% block title %}
@@ -113,6 +126,24 @@ transition: 300ms ease;
     </div>
     {% set total_rows = 25 %}
     {% set total_seats_per_row = 32 %}
+         
+    <input type="hidden" name="dummy_variable" value="{{ current_day }}">
+        <div class="seat-row">
+            <div class="seat-label"></div>
+            {% for seat_num in range(1, total_seats_per_row + 1) %}
+                {% if seat_num == 7 or seat_num == 27 %}
+                    <div class="passage"></div>
+                {% endif %}
+                <div class="passage2"></div>
+                <div class="content checkBoxAudi mycheckbox row_head">
+                    {{ seat_num }}
+                </div>
+            {% endfor %}
+        </div>
+
+
+
+
     {% for row_num in range(1, total_rows + 1) %}
     <input type="hidden" name="dummy_variable" value="{{ current_day }}">
         <div class="seat-row">
@@ -125,9 +156,9 @@ transition: 300ms ease;
                 <div class="content">
                     <label class="checkBoxAudi">
                         <input name="mycheckbox" value="{{ seat_num }}_{{ row_num }}" type="checkbox"{% if get_auditorium_seat_availability(seat_num, row_num, current_day) == 'Occupied' %}checked{% endif %}>
-                        {% if get_auditorium_seat_availability(seat_num, row_num, current_day) == 'Vacant' %}
+                        <!-- {% if get_auditorium_seat_availability(seat_num, row_num, current_day) == 'Vacant' %}
                             <span>{{ seat_num }}</span>
-                        {% endif %}
+                        {% endif %} -->
                         <div class="transition"></div>
                     </label>
                 </div>

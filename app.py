@@ -1,22 +1,22 @@
 
 from flask import Flask
-from flask import render_template
+from flask import render_template, Response, request, make_response
 from flask import request
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from flask_qrcode import QRcode
 import sqlite3
-
+import pdfkit
+import random
 
 app = Flask(__name__)
-
+QRcode(app)
 admin_id = 'cap'
 admin_password = '1234'
-# Home Page route
 @app.route("/")
 def home():
     return render_template("home.html")
 
-# Route to form used to add a new student to the database
 @app.route("/register")
 def enternew():
     return render_template("student.html")
@@ -31,6 +31,7 @@ def authenticate():
         # Retrieve form data
         firstname = request.form['username1']
         lastname = request.form['username2']
+        mis = request.form['mis']
         password = request.form['password']
 
         # Connect to the database
@@ -38,12 +39,14 @@ def authenticate():
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname,lastname))
         user = cursor.fetchone()
+        if(firstname == 'cap' and lastname == 'T' and password == admin_password):
+            return render_template('adminlogin.html')   
 
         if(user):            
             # Check if the username and password match a record in the database
             conn = sqlite3.connect('database.db')
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=?', (firstname,lastname,password))
+            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=? AND mis=?', (firstname,lastname,password,mis))
             userandpass = cursor.fetchone()
 
             if(firstname == 'cap' and lastname == 'T' and password == admin_password):
@@ -53,12 +56,12 @@ def authenticate():
                     # Successful authentication, redirect to selectvenue.html
                     print("Successful authentication")
                     conn.close()
-                    return render_template('selectvenue.html')
+                    return render_template('selectvenue.html',mis = mis)
                 else:
                     # Authentication failed, render login.html with an error message
                     print("Authentication failed")
                     conn.close()
-                    return render_template("login.html", error="Incorrect password. Please try again.")
+                    return render_template("login.html", error="Incorrect password/MIS. Please try again.")
         
         else:
             conn.close()
@@ -68,24 +71,19 @@ def authenticate():
             return render_template("login.html")
 
 
-# Route to add a new record (INSERT) student data to the database
 @app.route("/addrec", methods = ['POST', 'GET'])
 def addrec():
-    # Data will be available from POST submitted by the form
     if request.method == 'POST':
         try:
             firstname = request.form['username1']
             lastname = request.form['username2']
             email = request.form['email']
+            mis = request.form['mis']
             password = request.form['password']
             cpassword = request.form['cpassword']
-            # print(firstname)
-            # print(lastname)
-            # print(email)
-            # print(password)
             with sqlite3.connect('database.db') as con:
                 cur = con.cursor()
-                cur.execute("INSERT INTO students2 (firstname, lastname, email, password) VALUES (?,?,?,?)", (firstname, lastname, email, password))
+                cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)", (firstname, lastname, email, password, mis))
 
                 con.commit()
                 msg = "You have successfully created an account. Please proceed to login."
@@ -95,14 +93,10 @@ def addrec():
 
         finally:
             con.close()
-            # Send the transaction message to result.html
             return render_template('login.html',msg=msg)
 
-# Route to SELECT all data from the database and display in a table      
 @app.route('/list')
 def list():
-    # Connect to the SQLite3 datatabase and 
-    # SELECT rowid and all Rows from the students table.
     con = sqlite3.connect("database.db")
     con.row_factory = sqlite3.Row
 
@@ -111,17 +105,13 @@ def list():
 
     rows = cur.fetchall()
     con.close()
-    # Send the results of the SELECT to the list.html page
     return render_template("list.html",rows=rows)
 
-# Route that will SELECT a specific row in the database then load an Edit form 
 @app.route("/edit", methods=['POST','GET'])
 def edit():
     if request.method == 'POST':
         try:
-            # Use the hidden input value of id from the form to get the rowid
             id = request.form['id']
-            # Connect to the database and SELECT a specific rowid
             con = sqlite3.connect("database.db")
             con.row_factory = sqlite3.Row
 
@@ -133,23 +123,18 @@ def edit():
             id=None
         finally:
             con.close()
-            # Send the specific record of data to edit.html
             return render_template("edit.html",rows=rows)
 
-# Route used to execute the UPDATE statement on a specific record in the database
 @app.route("/editrec", methods=['POST','GET'])
 def editrec():
-    # Data will be available from POST submitted by the form
     if request.method == 'POST':
         try:
-            # Use the hidden input value of id from the form to get the rowid
             rowid = request.form['rowid']
             nm = request.form['nm']
             addr = request.form['add']
             city = request.form['city']
             zip = request.form['zip']
 
-            # UPDATE a specific record in the database based on the rowid
             with sqlite3.connect('database.db') as con:
                 cur = con.cursor()
                 cur.execute("UPDATE students SET name='"+nm+"', addr='"+addr+"', city='"+city+"', zip='"+zip+"' WHERE rowid="+rowid)
@@ -162,17 +147,13 @@ def editrec():
 
         finally:
             con.close()
-            # Send the transaction message to result.html
             return render_template('result.html',msg=msg)
 
-# Route used to DELETE a specific record in the database    
 @app.route("/delete", methods=['POST','GET'])
 def delete():
     if request.method == 'POST':
         try:
-            # Use the hidden input value of id from the form to get the rowid
             rowid = request.form['id']
-            # Connect to the database and DELETE a specific record based on rowid
             with sqlite3.connect('database.db') as con:
                     cur = con.cursor()
                     cur.execute("DELETE FROM students WHERE rowid="+rowid)
@@ -191,20 +172,65 @@ def delete():
 def redirect():
     return render_template('adminlogin.html')
     
-@app.route("/redirectvenue", methods=['POST','GET'])
+@app.route("/redirectvenue", methods=['POST'])
 def redirectvenue():
     current_day = datetime.now().strftime('%A') 
-    selected_venue = request.args.get('venue')
+    mis = request.form.get('misno')
+    selected_venue = request.form.get('venue')
     if selected_venue == 'Auditorium':
-        return render_template('auditorium.html',current_day=current_day, get_auditorium_seat_availability = get_auditorium_seat_availability)
+        return render_template('auditorium.html',current_day=current_day, get_auditorium_seat_availability = get_auditorium_seat_availability, mis = mis)
     elif selected_venue == 'parking_slot':
-        return render_template('parking_slot.html')
+        return render_template('parking_slot.html', mis = mis)
     elif selected_venue == 'AC_building_1':
-        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1, mis = mis)
     elif selected_venue == 'AC_building_2':
-        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
+        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2, mis = mis)
     else: 
         return render_template('selectvenue.html')  
+
+@app.route("/bookseat", methods=['POST'])
+def bookseat():
+    
+    mis = request.form.get('misno')
+    row = request.form.get('row')
+    column = request.form.get('column')
+    current_day =  request.form.get('day')
+
+    receiptnum = (int(mis) // 5000) + int(row) + int(column) + random.randint(1,20)
+    
+    row_label = chr(int(row) + 96)
+    print(row_label)
+    if(int(row) > 25 or int(row) < 1 or int(column) > 32 or int(column) < 1):
+        error = "Invalid seat number, re-enter"
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)        
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    table_name = "mainAuditorium"
+    query = f"UPDATE {table_name} SET status = 'Occupied' WHERE day = ? AND row_label = ? AND seat_number = ?"
+    cursor.execute(query, (current_day, row_label, column))
+    conn.commit()
+    conn.close()
+    pdf = "positive"
+    return render_template("auditorium.html", receiptnum = receiptnum ,current_day = current_day, mis = mis, pdf = pdf, get_auditorium_seat_availability = get_auditorium_seat_availability, column = column , row = row)        
+
+@app.route("/generate_pdf", methods=['POST'])
+def generate_pdf():
+    mis = request.form.get('misno')
+    row = request.form.get('row')
+    column = request.form.get('column')
+    current_day =  request.form.get('day')
+    row_label = chr(int(row) + 96)
+    receiptnum = request.form.get('receiptnum')
+    # receiptnum = (int(mis) // 5000) + int(row) + int(column) + random.randint(1,20)
+    html = f"<html><body><h1>Receipt number : {receiptnum}<h1/><h1>{mis} : You request has been processed</h1><h1>Your booked seat is : {row}-{column}</h1></body></html>"  
+    pdf = pdfkit.from_string(html, False, configuration=pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf'))
+    headers = {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': f"attachment;filename={mis}_receipt.pdf"
+    }
+
+    response = Response(pdf, headers=headers)
+    return response
 
 def get_room_availability(room_id, current_day, time_slot, floor):
     conn = sqlite3.connect('database.db')
@@ -318,7 +344,6 @@ def changeACdatabase():
                         start_hour = row_index + 9
                         end_hour = start_hour + 1
                         
-                        # Adjust time format for 'am' and 'pm' transitions
                         start_ampm = 'am' if start_hour < 12 else 'pm'
                         start_hour = start_hour % 12 if start_hour % 12 != 0 else 12
                         start_time = f"{start_hour}{start_ampm}"
@@ -352,11 +377,9 @@ def changeACdatabase():
             for row_index, row in enumerate(arr):
                 for col_index, element in enumerate(row):
                     if element == 0:
-                        # Reconstruct time slot based on row_index
                         start_hour = row_index + 9
                         end_hour = start_hour + 1
                         
-                        # Adjust time format for 'am' and 'pm' transitions
                         start_ampm = 'am' if start_hour < 12 else 'pm'
                         start_hour = start_hour % 12 if start_hour % 12 != 0 else 12
                         start_time = f"{start_hour}{start_ampm}"

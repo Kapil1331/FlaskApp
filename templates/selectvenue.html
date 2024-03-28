@@ -6,7 +6,8 @@
 {% block content %}
     <h1>Select The Venue</h1>
 
-    <form class="form-venue" action="{{ url_for('redirectvenue') }}" method="GET">
+    <form class="form-venue" action="{{ url_for('redirectvenue') }}" method="POST">
+        <input type="hidden" name="misno" value="{{ mis }}">
         <label for="venue">Choose a Venue:</label>
         <select id="venue" name="venue">
             <option value="AC_building_1">Academic Complex Building Floor 1</option>
