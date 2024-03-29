@@ -1,45 +1,99 @@
-    {% extends "layout.html" %}
-    {% block title %}
-        Academic Complex Floor 1 - {{ current_day }}
-    {% endblock %}
-    {% block content %}
-        <div class="rooms-container">
-            {% if current_day %}
-                <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
-                <form action="{{ url_for('changeACdatabase') }}" method="post">
-                    <input type="hidden" name="dummy_variable" value="{{ current_day }}">
-                    <input type="hidden" name="dummy_variable2" value="1">
-                    <table class="availability-table">
+<style>
+.checkbox {
+    appearance: none;
+    overflow: hidden;
+    width: 130px; /* Change width to 130px */
+    height: 30px; /* Change height to 30px */
+    aspect-ratio: 1/1;
+    border-radius: 100% 0% 100% 0% / 0% 100% 0% 100%;
+    border: 2px solid rgb(0, 102, 255); /* Change border color to blue */
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+  
+.checkbox::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    font-size: 35px;
+    width: 100%; /* Adjust to fill the entire space */
+    height: 100%; /* Adjust to fill the entire space */
+    transition: all 0.2s ease-in-out;
+    }
+
+.checkbox:checked {
+    border: 2px solid rgb(173, 216, 230); /* Change border color to a light blue */
+    background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
+    box-shadow: -2px -2px 20px rgba(173, 216, 230, 1), 2px 2px 20px rgba(0, 102, 255, 1); /* Adjust shadow colors and width */
+}
+
+.checkbox:checked::before {
+    background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
+}
+
+button[type="submit"] {
+        background-color: #1e70c7;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        border: none;
+        margin-top: 20px; /* Add some margin */
+}
+
+button[type="submit"] a {
+        color: white;
+        text-decoration: none;
+    }
+
+</style>
+
+{% extends "layout.html" %}
+{% block title %}
+    Academic Complex Floor 1 - {{ current_day }}
+{% endblock %}
+{% block content %}
+    <div class="rooms-container">
+        {% if current_day %}
+            <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
+            <form action="{{ url_for('changeACdatabase') }}" method="post">
+                <input type="hidden" name="dummy_variable" value="{{ current_day }}">
+                <input type="hidden" name="dummy_variable2" value="1">
+                <table class="availability-table">
+                    <tr>
+                        <th>Time Slot</th>
+                        <th>Room 101</th>
+                        <th>Room 102</th>
+                        <th>Room 103</th>
+                        <th>Room 104</th>
+                    </tr>
+                    {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
+                    {% for time_slot in time_slots %}
                         <tr>
-                            <th>Time Slot</th>
-                            <th>Room 101</th>
-                            <th>Room 102</th>
-                            <th>Room 103</th>
-                            <th>Room 104</th>
+                            <td>{{ time_slot }}</td>
+                            <td>
+                                <input type="checkbox" class="checkbox" name="mycheckbox" value="1_{{ time_slot }}" {% if get_room_availability('r101', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="checkbox" name="mycheckbox" value="2_{{ time_slot }}" {% if get_room_availability('r102', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="checkbox" name="mycheckbox" value="3_{{ time_slot }}" {% if get_room_availability('r103', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="checkbox" name="mycheckbox" value="4_{{ time_slot }}" {% if get_room_availability('r104', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
+                            </td>
                         </tr>
-                        {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
-                        {% for time_slot in time_slots %}
-                            <tr>
-                                <td>{{ time_slot }}</td>
-                                <td>
-                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="1_{{ time_slot }}" {% if get_room_availability('r101', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
-                                </td>
-                                <td>
-                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="2_{{ time_slot }}" {% if get_room_availability('r102', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
-                                </td>
-                                <td>
-                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="3_{{ time_slot }}" {% if get_room_availability('r103', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
-                                </td>
-                                <td>
-                                    <input type="checkbox" class="checkbox" name="mycheckbox" value="4_{{ time_slot }}" {% if get_room_availability('r104', current_day, time_slot, floor) == 'Occupied' %}checked{% endif %}>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                    <button type="submit" style="background-color: #ADD8E6; color: white; border-radius: 5px; padding: 10px 20px; border: none;">Submit Changes</button>
-                </form>
-            {% else %}
-                <p>No current day selected.</p>
-            {% endif %}
-        </div>
-    {% endblock %}
+                    {% endfor %}
+                </table>
+                <button type="submit">Submit Changes</button>
+                <br>
+                
+            </form>
+            <a href="/redirect">
+                <button>Select Venue to Edit</button>
+            </a>
+        {% else %}
+            <p>No current day selected.</p>
+        {% endif %}
+    </div>
+{% endblock %}

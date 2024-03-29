@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theater Seat Selection</title>
+<style>
+    /* Import Kanit font */
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap');
+
+    /* Hide default checkbox */
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    /* Styling for custom checkbox */
+    .seat {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        background-color: #e6e6e6; /* Default background color */
+        border: 1px solid #ccc; /* Border */
+        border-radius: 5px; /* Rounded corners */
+        margin: 5px; /* Margin around each seat */
+        cursor: pointer; /* Change cursor to pointer */
+        position: relative;
+        transition: background-color 0.3s; /* Smooth transition */
+    }
+
+    input[type="checkbox"]:checked + .seat {
+        background-color: #007bff; /* Background color when seat is selected */
+        border-color: #0056b3; /* Border color when seat is selected */
+        color: #fff; /* Text color when seat is selected */
+    }
+
+    .seat:hover {
+        background-color: #ccc; /* Change background color on hover */
+    }
+
+    .seat-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'Kanit', sans-serif; /* Use Kanit font */
+        font-size: 14px; /* Font size */
+        font-weight: bold; /* Bold font */
+        color: #000; /* Text color */
+    }
+</style>
+</head>
+<body>
+    <h1>Theater Seat Selection</h1>
+    <p>Select your seats:</p>
+    <label>
+        <input type="checkbox" checked>
+        <div class="seat">
+            <span class="seat-label">A1</span>
+        </div>
+    </label>
+    <label>
+        <input type="checkbox">
+        <div class="seat">
+            <span class="seat-label">A2</span>
+        </div>
+    </label>
+    <label>
+        <input type="checkbox">
+        <div class="seat">
+            <span class="seat-label">A3</span>
+        </div>
+    </label>
+    <!-- Add more seats as needed -->
+</body>
+</html>

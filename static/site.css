@@ -1,57 +1,3 @@
-.navbar {
-    background-color: lightslategray;
-    font-size: 1em;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    color: white;
-    padding: 8px 5px 8px 5px;
-}
-
-.navbar a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.navbar-brand {
-    font-size: 1.2em;
-    font-weight: 600;
-}
-
-.navbar-item {
-    font-variant: small-caps;
-    margin-left: 30px;
-}
-
-.body-content {
-    padding: 5px;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    min-height: 100vh;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-}
-  
-footer {
-    margin-top: auto;
-    background-color: lightslategray;
-    color: white;
-    text-align: center;
-    padding: 8px 5px;
-}
-
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;  /* Center-align items horizontally */
-    justify-content: center;  /* Center-align items vertically */
-}
-
-.footer-content img {
-    margin-bottom: -20px;  /* Add some space between the logo and the text */
-}
 
 .container{
     text-align: center;
@@ -75,7 +21,7 @@ input[type='password'] {
 .input {
     border: 2px solid transparent;
     width: 15em;
-    height: 2.5em;
+    height: 3.5em;
     padding-left: 0.8em;
     outline: none;
     overflow: hidden;
@@ -91,77 +37,30 @@ input[type='password'] {
     background-color: white;
 }
 
-.rooms-container {
-    display: flex;
-    flex-direction: column; 
-    align-items: stretch;
-    margin: 20px;
-}
 
-.day-column {
-    display: flex;
-    flex-direction: row; 
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.room-card {
-    width: 100px;
-    height: 70px;
-    padding: 10x;
-    margin: 8px;
-    border-radius: 10px;
-    box-shadow: 6px 6px 12px #bebebe,
-               -6px -6px 12px #ffffff;
-    background: #BBE2EC;
-    text-align: center;
-    justify-content: center;
-}
-
-.room-card h2 {
-    padding: 20px;
-    font-size: 18px;
-    color: #1B3C73;
-}
-
-.room-card p {
-    font-size: 10px;
-    color: #333;
-}
-
-.cardWhite {
-    width: 250px;
-    height: 50px;
-    border-radius: 10px;
-    background: #BBE2EC;
-    box-shadow: 6px 6px 12px #bebebe,
-               -6px -6px 12px #ffffff;
-}
-
-.cardRed {
-    width: 300px;
-    height: 60px;
-    border-radius: 10px;
-    background: #D24545;
-    box-shadow: 6px 6px 12px #bebebe,
-               -6px -6px 12px #ffffff;
-}
 
 .form-venue {
-    max-width: 400px;
+    max-width: 800px;
     margin: 20px auto;
+    height: 90vh;
+    max-height: 250px;
+    width: 90vw;
+    min-width: 100px;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-.form-venue label {
-    display: block;
+/* .form-venue label {
+    display: inline-block;
+    justify-content: center;
     margin-bottom: 8px;
-    font-size: 16px;
-}
+    font-size: 20px;
+    text-align: center;
+} */
 
 .form-venue select {
     width: 100%;
@@ -172,6 +71,24 @@ input[type='password'] {
     box-sizing: border-box;
 }
 
+/* .form-venue {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /* background: repeating-linear-gradient(45deg, #9cbcff,#9cbcff 20px, #b3daffde 20px,#b3daffde 40px); */
+    /* background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+} */
+
+/* Other styles for the form */
+
+
+.form-venue h1 {
+    text-align: center;
+}
 .form-venue input[type="submit"] {
     background-color: #007BFF;
     color: #fff;
@@ -180,44 +97,13 @@ input[type='password'] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.form-venue h1 {
-    text-align: center;
+.form-venue input[type="submit"]:hover {
+    background-color: #0056b3;
 }
 
-
-.checkbox {
-    appearance: none;
-    overflow: hidden;
-    width: 130px; /* Change width to 130px */
-    height: 30px; /* Change height to 30px */
-    aspect-ratio: 1/1;
-    border-radius: 100% 0% 100% 0% / 0% 100% 0% 100%;
-    border: 2px solid rgb(0, 102, 255); /* Change border color to blue */
-    position: relative;
-    transition: all 0.2s ease-in-out;
-}
-  
-.checkbox::before {
-position: absolute;
-inset: 0;
-content: "";
-font-size: 35px;
-width: 100%; /* Adjust to fill the entire space */
-height: 100%; /* Adjust to fill the entire space */
-transition: all 0.2s ease-in-out;
-}
-
-.checkbox:checked {
-border: 2px solid rgb(173, 216, 230); /* Change border color to a light blue */
-background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
-box-shadow: -2px -2px 20px rgba(173, 216, 230, 1), 2px 2px 20px rgba(0, 102, 255, 1); /* Adjust shadow colors and width */
-}
-
-.checkbox:checked::before {
-background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
-}
 
 button {
     background-color: white;
@@ -227,8 +113,66 @@ button {
     border: none;
     cursor: pointer;
     width: 40%;
+    display: block; /* Change the display property to block */
+    margin-left: auto; /* Set margin-left to auto */
+    margin-right: auto; /* Set margin-right to auto */
 }
 
 button:hover {
    opacity: 0.9;
+}
+
+.seat {
+    position: relative; /* Position relative for absolute positioning of seat number */
+    width: 30px;
+    height: 30px;
+    background-color: #e6e6e6;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.seat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.seat-number {
+    position: absolute; /* Position seat number */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Centering */
+    font-size: 12px; /* Adjust font size */
+}
+
+.seat-label {
+    margin-right: 10px;
+}
+
+.seat:hover {
+    background-color: #d9d9d9; /* Change background color on hover */
+}
+
+.seat.selected {
+    background-color: #007bff; /* Background color when seat is selected */
+    border-color: #0056b3; /* Border color when seat is selected */
+    color: #fff; /* Text color when seat is selected */
+}
+
+.passage {
+    width: 50px; /* Adjust width as needed */
+    flex: 0 0 auto;
+}
+
+.passage2 {
+    width: 5px; /* Adjust width as needed */
+    flex: 0 0 auto;
+}
+
+.clear {
+    clear: both;
 }
