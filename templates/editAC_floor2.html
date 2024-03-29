@@ -1,49 +1,49 @@
 <style>
-    .checkbox {
-        appearance: none;
-        overflow: hidden;
-        width: 130px; /* Change width to 130px */
-        height: 30px; /* Change height to 30px */
-        aspect-ratio: 1/1;
-        border-radius: 100% 0% 100% 0% / 0% 100% 0% 100%;
-        border: 2px solid rgb(0, 102, 255); /* Change border color to blue */
-        position: relative;
-        transition: all 0.2s ease-in-out;
-    }
-      
-    .checkbox::before {
-        position: absolute;
-        inset: 0;
-        content: "";
-        font-size: 35px;
-        width: 100%; /* Adjust to fill the entire space */
-        height: 100%; /* Adjust to fill the entire space */
-        transition: all 0.2s ease-in-out;
-        }
-    
-    .checkbox:checked {
-        border: 2px solid rgb(173, 216, 230); /* Change border color to a light blue */
-        background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
-        box-shadow: -1px -1px 20px rgba(173, 216, 230, 1), 2px 2px 20px rgba(0, 102, 255, 1); /* Adjust shadow colors and width */
-    }
-    
-    .checkbox:checked::before {
-        background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%); /* Adjust gradient colors */
-    }
+.checkbox {
+    appearance: none;
+    overflow: hidden;
+    width: 130px;
+    height: 30px;
+    aspect-ratio: 1/1;
+    border-radius: 20px; /* Further reduce roundness */
+    border: 2px solid rgb(0, 102, 255);
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+  
+.checkbox::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    font-size: 35px;
+    width: 100%;
+    height: 100%;
+    transition: all 0.2s ease-in-out;
+}
+
+.checkbox:checked {
+    border: 2px solid rgb(173, 216, 230);
+    background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%);
+    box-shadow: -2px -2px 20px rgba(173, 216, 230, 1), 2px 2px 20px rgba(0, 102, 255, 1);
+}
+
+.checkbox:checked::before {
+    background: linear-gradient(135deg, rgb(173, 216, 230) 0%, rgb(0, 102, 255) 100%);
+}
 
 button[type="submit"] {
     background-color: #1e70c7;
     color: white;
-    border-radius: 5px;
+    border-radius: 5px; /* Further reduce roundness */
     padding: 10px 20px;
     border: none;
-    margin-top: 20px; /* Add some margin */
+    margin-top: 20px;
 }
 
 button[type="submit"] a {
-        color: white;
-        text-decoration: none;
-    }
+    color: white;
+    text-decoration: none;
+}
 
     </style>
 {% extends "layout.html" %}
@@ -53,7 +53,10 @@ button[type="submit"] a {
 {% block content %}
     <div class="rooms-container">
         {% if current_day %}
-            <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
+        <br>
+        <br>
+        <h3 style="text-align: center;">The Availability for {{ current_day }}</h3>
+        <br>
             <form action="{{ url_for('changeACdatabase') }}" method="post">
                 <input type="hidden" name="dummy_variable" value="{{ current_day }}">
                 <input type="hidden" name="dummy_variable2" value="2">                
@@ -86,8 +89,13 @@ button[type="submit"] a {
                 </table>
                 <button type="submit">Submit Changes</button>
                 <br>
-                <button type="submit"><a href="/redirect">Select Venue to Edit</a></button>
+
             </form>
+            <div style="text-align: center;"> <!-- Center the anchor tag -->
+                <a href="/redirect" style="text-decoration: none; display: inline-block;"> <!-- Add styles to anchor tag -->
+                    <button type="submit" style="width: 270px; height: 35px;">Select Venue to Edit</button> <!-- Add width and height to button -->
+                </a>
+            </div>
         {% else %}
             <p>No current day selected.</p>
         {% endif %}
