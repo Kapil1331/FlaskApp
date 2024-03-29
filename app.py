@@ -1,7 +1,7 @@
 
 from flask import Flask
 from flask import render_template, Response, request, make_response
-from flask import request
+from flask import request,jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from flask_qrcode import QRcode
@@ -20,6 +20,10 @@ def home():
 @app.route("/register")
 def enternew():
     return render_template("student.html")
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html'), 404
 
 @app.route("/login")
 def login():
@@ -177,6 +181,10 @@ def redirectvenue():
     current_day = datetime.now().strftime('%A') 
     mis = request.form.get('misno')
     selected_venue = request.form.get('venue')
+    # print(selected_venue)
+    if not selected_venue:
+        error = "No venue selected. Please select one"
+        return render_template('selectvenue.html', error = error)  
     if selected_venue == 'Auditorium':
         return render_template('auditorium.html',current_day=current_day, get_auditorium_seat_availability = get_auditorium_seat_availability, mis = mis)
     elif selected_venue == 'parking_slot':
@@ -188,9 +196,19 @@ def redirectvenue():
     else: 
         return render_template('selectvenue.html')  
 
+@app.route("/seatbook")
+
+
 @app.route("/bookseat", methods=['POST'])
 def bookseat():
-    
+    # seat = request. get_json()
+
+    # seat = request.form.get('formValues')
+    # print(seat)
+    # row = seat[0]
+    # column = seat[1]
+    # mis = seat[2]
+    # current_day = seat[3]
     mis = request.form.get('misno')
     row = request.form.get('row')
     column = request.form.get('column')

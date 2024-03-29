@@ -1,3 +1,32 @@
+<style>
+    .input-audi {
+ border: none;
+ padding: 1rem;
+ border-radius: 1rem;
+ background: #e8e8e8;
+ box-shadow: 20px 20px 60px #949494,
+		-20px -20px 60px #ffffff;
+ transition: 0.3s;
+ width: 10em;
+ height: 1em;
+}
+
+.input-audi:focus {
+ outline-color: #e8e8e8;
+ background: #e8e8e8;
+ box-shadow: inset 20px 20px 60px #c5c5c5,
+		inset -20px -20px 60px #ffffff;
+ transition: 0.3s;
+}
+
+.btn0 {  font-family: Arial, Helvetica, sans-serif;  text-transform: uppercase;}  
+.btn0:hover .btn-slide-show-text1 {  margin-left: 65px;}  
+.flash-slide {  border: medium;  display: inline-block;  color: rgb(255, 255, 255);  margin: 20px;  width: 180px;  height: 50px;  border-radius: 10px;  position: relative;  overflow: hidden;  text-decoration: none;  text-transform: uppercase;  font-family: Helvetica;  text-align: center;}  
+.flash-slide::before {  content: "";  position: absolute;  top: -30px;  left: -80px;  height: 100px;  width: 70px;  background: rgba(255, 255, 255, 0.3);  transform: rotate(20deg);}  
+.flash-slide:hover::before {  left: 190px;  transition: 0.5s;}  
+.flash-slide--blue {  background: rgb(61, 135, 255);}  
+
+</style>
 {% extends "layout.html" %}
 {% block title %}
     Academic Complex Floor 1 - {{ current_day }}
@@ -13,6 +42,8 @@
     {% if error %}
         <p class="error-message">{{ error }}</p>
     {% endif %}
+
+
     {% if pdf %}
         <form class="booking-form" action="{{ url_for('generate_pdf') }}" method="POST">
             <input type="hidden" name="misno" value="{{ mis }}">
@@ -20,22 +51,40 @@
             <input type="hidden" name="day" value="{{ current_day }}">
             <input type="hidden" name="row" value="{{ row }}">
             <input type="hidden" name="column" value="{{ column }}">
-            <input type="submit" value="generatePdf">
+            <input type="submit" value="generatePdf" class="btn0 flash-slide flash-slide--blue booking-form">
         </form>
     {% endif %}
+
+
+
     {% if not pdf %}
+    <input type="hidden" name="misno" id="misno" value="{{ mis }}">
+    <input type="hidden" name="day" id="day" value="{{ current_day }}">
+    <button class="btn0 flash-slide flash-slide--blue booking-form" onclick="book_seat()">Book Seat</button>
+    {% endif %}
+
+
+    <!-- {% if not pdf %}
     <form class="booking-form" action="{{ url_for('bookseat') }}" method="POST">
         <input type="hidden" name="misno" value="{{ mis }}">
         <input type="hidden" name="day" value="{{ current_day }}">
-        <label for="row">Row:</label>
-        <input type="number" id="row" name="row" min="1" max="{{ total_rows }}" required>
         
-        <label for="column">Column:</label>
-        <input type="number" id="column" name="column" min="1" max="{{ total_seats_per_row }}" required>
+        <label for="row">Row </label>
+        <input class = "input-audi" type="number" id="row" name="row" min="1" max="{{ total_rows }}" required>
         
-        <input type="submit" value="Book">
+        <label for="column">Column </label>
+        <input class = "input-audi" type="number" id="column" name="column" min="1" max="{{ total_seats_per_row }}" required>
+        
+        <input class="input-audi" type="submit" value="Book" style="text-align: center;">
     </form>
-    {% endif %}
+    {% endif %} -->
+
+
+
+
+
+
+
     {% set total_rows = 25 %}
     {% set total_seats_per_row = 32 %}
     {% for row_num in range(1, total_rows + 1) %}
@@ -56,8 +105,33 @@
         </div>
     {% endfor %}
 </div>
+
 {% if pdf %}
-    <img src="{{ qrcode('Receipt Number : {} Seat Number {}-{}'.format(receiptnum, row, column)) }}">
+<script>
+    window.onload = function display_qr(){
+        Swal.fire({
+        title: "Your Ticket",
+        text: "Booking Success",
+        showConfirmButton: false,
+        imageUrl: "{{ qrcode('Receipt Number : {} Seat Number {}-{}'.format(receiptnum, row, column)) }}",
+        imageWidth: 400,
+        imageHeight: 400,
+        html: `
+        <form class="booking-form" action="{{ url_for('generate_pdf') }}" method="POST">
+            <input type="hidden" name="misno" value="{{ mis }}">
+            <input type="hidden" name="receiptnum" value="{{ receiptnum }}">
+            <input type="hidden" name="day" value="{{ current_day }}">
+            <input type="hidden" name="row" value="{{ row }}">
+            <input type="hidden" name="column" value="{{ column }}">
+            <input type="submit" value="generatePdf" class="btn0 flash-slide flash-slide--blue booking-form">
+        </form>  
+                `,
+        imageAlt: "qr"
+
+        });
+    }
+</script>
+    <!-- <img src="{{ qrcode('Receipt Number : {} Seat Number {}-{}'.format(receiptnum, row, column)) }}"> -->
 {% endif %}
 
 {% endblock %}

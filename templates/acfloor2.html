@@ -1,30 +1,150 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&display=swap">
+
+<style>.rooms-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: stretch;
+    margin: 20px;
+}
+
+.day-column {
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.room-card {
+    width: 100px;
+    height: 70px;
+    padding: 10x;
+    margin: 8px;
+    border-radius: 10px;
+    box-shadow: 6px 6px 12px #bebebe,
+               -6px -6px 12px #ffffff;
+    background: #BBE2EC;
+    text-align: center;
+    justify-content: center;
+}
+
+.room-card h2 {
+    padding: 20px;
+    font-size: 18px;
+    color: #1B3C73;
+}
+
+.room-card p {
+    font-size: 10px;
+    color: #333;
+}
+
+.cardWhite {
+    width: 250px;
+    height: 50px;
+    border-radius: 10px;
+    background: #BBE2EC;
+    box-shadow: 6px 6px 12px #bebebe,
+               -6px -6px 12px #ffffff;
+}
+
+.cardRed {
+    width: 300px;
+    height: 60px;
+    border-radius: 10px;
+    background: #D24545;
+    box-shadow: 6px 6px 12px #bebebe,
+               -6px -6px 12px #ffffff;
+}
+
+/* Button styles */
+.btn {
+  font-family: Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+}
+
+/* Button hover effect */
+.btn:hover .btn-slide-show-text1 {
+  margin-left: 65px;
+}
+
+/* Flash slide styles */
+.flash-slide {
+  border: medium;
+  display: inline-block;
+  color: rgb(255, 255, 255);
+  margin: 10px;
+  width: 180px;
+  height: 50px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: Helvetica;
+  text-align: center;
+}
+
+/* Flash slide pseudo-element */
+.flash-slide::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: -80px;
+  height: 100px;
+  width: 70px;
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(20deg);
+}
+
+/* Flash slide hover effect for pseudo-element */
+.flash-slide:hover::before {
+  left: 190px;
+  transition: 0.5s;
+}
+
+/* Flash slide color variation */
+.flash-slide--blue {
+  background: rgb(61, 135, 255);
+}
+
+.flash-slide--red {
+  background: rgb(240, 45, 68);
+}
+
+.timeslot-row {
+  font-family: 'Chakra Petch', sans-serif; /* Use Chakra Petch font */
+  font-weight: bold; /* Make text bold */
+}
+
+
+</style>
 {% extends "layout.html" %}
 {% block title %}
-    Academic Complex Floor 1 - {{ current_day }}
+    Academic Complex Floor 2 - {{ current_day }}
 {% endblock %}
 {% block content %}
     <div class="rooms-container">
         {% if current_day %}
-            <h2 style="text-align: center;">The Availability for {{ current_day }}</h2>
+            <h2 style="text-align: center;">Availability of Academic Complex for {{ current_day }}</h2>
             <table class="availability-table">
                 <tr>
-                    <th style="text-align: cneter;"><h3>Time Slot</h3></th>
+                    <th style="text-align: center; "class = "timeslot-row"><h3>Time Slot</h3></th>
                     {% set room_numbers = ['201', '202', '203', '204'] %}
                     {% for room_number in room_numbers %}
-                        <th style="text-align: center;"><h3>Room {{ room_number }}</h3></th>
+                        <th style="text-align: center;" class="timeslot-row" ><h3>Room {{ room_number }}</h3></th>
                     {% endfor %}
                 </tr>
                 {% set time_slots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm', '4pm-5pm', '5pm-6pm'] %}
                 {% for time_slot in time_slots %}
                     <tr>
-                        <td align="center">{{ time_slot }}</td>
+                        <td class = "timeslot-row" align="center">{{ time_slot }}</td>
                         {% for room_number in room_numbers %}
                             <td align="center">
                                 {% set room_id = 'r' + room_number %}
                                 {% set room_availability = get_room_availability(room_id, current_day, time_slot, floor) %}
-                                <div class="room-card {% if room_availability == 'Occupied' %}cardRed{% else %}cardWhite{% endif %}">
-                                    <h2>Room {{ room_number }}</h2>
-                                </div>
+                                <button class="flash-slide flash-slide--{% if room_availability == 'Occupied' %}red{% else %}blue{% endif %} timeslot-row">
+                                    Room {{ room_number }}
+                                </button>
                             </td>
                         {% endfor %}
                     </tr>

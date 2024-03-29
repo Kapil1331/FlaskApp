@@ -21,7 +21,7 @@ input[type='password'] {
 .input {
     border: 2px solid transparent;
     width: 15em;
-    height: 2.5em;
+    height: 3.5em;
     padding-left: 0.8em;
     outline: none;
     overflow: hidden;
@@ -37,65 +37,15 @@ input[type='password'] {
     background-color: white;
 }
 
-.rooms-container {
-    display: flex;
-    flex-direction: column; 
-    align-items: stretch;
-    margin: 20px;
-}
 
-.day-column {
-    display: flex;
-    flex-direction: row; 
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.room-card {
-    width: 100px;
-    height: 70px;
-    padding: 10x;
-    margin: 8px;
-    border-radius: 10px;
-    box-shadow: 6px 6px 12px #bebebe,
-               -6px -6px 12px #ffffff;
-    background: #BBE2EC;
-    text-align: center;
-    justify-content: center;
-}
-
-.room-card h2 {
-    padding: 20px;
-    font-size: 18px;
-    color: #1B3C73;
-}
-
-.room-card p {
-    font-size: 10px;
-    color: #333;
-}
-
-.cardWhite {
-    width: 250px;
-    height: 50px;
-    border-radius: 10px;
-    background: #BBE2EC;
-    box-shadow: 6px 6px 12px #bebebe,
-               -6px -6px 12px #ffffff;
-}
-
-.cardRed {
-    width: 300px;
-    height: 60px;
-    border-radius: 10px;
-    background: #D24545;
-    box-shadow: 6px 6px 12px #bebebe,
-               -6px -6px 12px #ffffff;
-}
 
 .form-venue {
-    max-width: 400px;
+    max-width: 800px;
     margin: 20px auto;
+    height: 90vh;
+    max-height: 250px;
+    width: 90vw;
+    min-width: 100px;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -104,11 +54,13 @@ input[type='password'] {
     text-align: center;
 }
 
-.form-venue label {
-    display: block;
+/* .form-venue label {
+    display: inline-block;
+    justify-content: center;
     margin-bottom: 8px;
-    font-size: 16px;
-}
+    font-size: 20px;
+    text-align: center;
+} */
 
 .form-venue select {
     width: 100%;
@@ -119,17 +71,17 @@ input[type='password'] {
     box-sizing: border-box;
 }
 
-.form-venue {
+/* .form-venue {
     max-width: 400px;
     margin: 20px auto;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
     /* background: repeating-linear-gradient(45deg, #9cbcff,#9cbcff 20px, #b3daffde 20px,#b3daffde 40px); */
-    background-size: cover;
+    /* background-size: cover;
     background-position: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+} */
 
 /* Other styles for the form */
 

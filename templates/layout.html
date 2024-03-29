@@ -5,9 +5,82 @@
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fandh.css')}}" />
-    </head>
+        
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <body>
+        <script>
+            function just_load(){
+                let timerInterval;
+                Swal.fire({
+                // title: "Auto close alert!",
+                html: "Loading ... <b></b>",
+                timer: 500,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                    const timer = Swal.getPopup().querySelector("b");
+                    timerInterval = setInterval(() => {
+                    timer.textContent = `${Swal.getTimerLeft()}`;
+                    }, 100);
+                },
+                willClose: () => {
+                    clearInterval(timerInterval);
+                }
+                }).then((result) => {
+                /* Read more about handling dismissals below */
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    console.log("I was closed by the timer");
+                }
+                });
+            }
+
+
+
+            function book_seat(){
+                Swal.fire({
+                title: "Enter Row and Column",
+                showConfirmButton: false,
+                html: `
+                <form action="bookseat" method="POST" class="seatbook">
+                    <input id="swal-input1 row" class="swal2-input" name="row" type="number" placeholder="row">
+                    <br>
+
+                    <input id="swal-input2 column" class="swal2-input" name="column" type="number" placeholder="column">
+
+                    <input type="hidden" name="misno" id="misno" value="{{ mis }}">
+                    <input type="hidden" name="day" id="day" value="{{ current_day }}">
+                    
+                    <input type="submit" value="BOOK" class="btn0 flash-slide flash-slide--blue booking-form">
+                </form>
+
+                    
+                `
+                // focusConfirm: false,
+                // preConfirm: () => {
+                //     return [
+                //     document.getElementById("swal-input1").value,
+                //     document.getElementById("swal-input2").value,
+                //     document.getElementById("misno").value,
+                //     document.getElementById("day").value
+                //     ];
+                // }
+                });
+                // if (formValues) {
+                // Swal.fire(JSON.stringify(formValues));
+                // }
+
+                // fetch("/bookseat", {
+                // method: "POST",
+                // // Set the FormData instance as the request body
+                // body: formValues,
+                // });
+            }
+        </script>
+
+    </head>
+        
+    <body onload="just_load()">
+        
         <div class="navbar">
             <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
             <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
@@ -38,6 +111,10 @@
                 </div>
             </div>
         </footer>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
         
     </body>
 </html>
