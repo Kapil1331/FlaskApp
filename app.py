@@ -213,9 +213,19 @@ def bookseat():
     row = request.form.get('row')
     column = request.form.get('column')
     current_day =  request.form.get('day')
+    if not row or not column:
+        error = "Invalid seat number, re-enter"
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)
 
+    if(int(row) > 25 or int(row) < 1 or int(column) > 32 or int(column) < 1):
+        error = "Invalid seat number, re-enter"
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)
     receiptnum = (int(mis) // 5000) + int(row) + int(column) + random.randint(1,20)
     
+    if get_auditorium_seat_availability(column, row, current_day) == 'Occupied':
+        error = "The seat you have booked is already Occupied! Select another seat."
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)
+
     row_label = chr(int(row) + 96)
     print(row_label)
     if(int(row) > 25 or int(row) < 1 or int(column) > 32 or int(column) < 1):
@@ -271,7 +281,7 @@ def get_auditorium_seat_availability(seat_number, row_label, current_day):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     
-    row_label = chr(ord('a') + row_label - 1) # converts numbers to alphabets
+    row_label = chr(ord('a') + int(row_label) - 1) # converts numbers to alphabets
     # seat_number = seat_number + 32 * (ord(row_label.lower()) - ord('a')) 
 
     query = "SELECT status FROM mainAuditorium WHERE seat_number = ? AND row_label = ? AND day = ?"
