@@ -12,7 +12,8 @@ import random
 app = Flask(__name__)
 QRcode(app)
 admin_id = 'cap'
-admin_password = '1234'
+admin_password_hash = generate_password_hash('1234')  # Hash the admin password
+
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -29,53 +30,110 @@ def page_not_found(e):
 def login():
     return render_template("login.html")
 
+# @app.route("/authenticate", methods=['POST', 'GET'])
+# def authenticate():
+#     if request.method == 'POST':
+#         # Retrieve form data
+#         firstname = request.form['username1']
+#         lastname = request.form['username2']
+#         mis = request.form['mis']
+#         password = request.form['password']
+
+#         # Connect to the database
+#         conn = sqlite3.connect('database.db')
+#         cursor = conn.cursor()
+#         cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname,lastname))
+#         user = cursor.fetchone()
+#         if(firstname == 'cap' and lastname == 'T' and password == admin_password):
+#             return render_template('adminlogin.html')   
+
+#         if(user):            
+#             # Check if the username and password match a record in the database
+#             conn = sqlite3.connect('database.db')
+#             cursor = conn.cursor()
+#             cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=? AND mis=?', (firstname,lastname,password,mis))
+#             userandpass = cursor.fetchone()
+
+#             if(firstname == 'cap' and lastname == 'T' and password == admin_password):
+#                 return render_template('adminlogin.html')            
+#             else:
+#                 if userandpass:
+#                     # Successful authentication, redirect to selectvenue.html
+#                     print("Successful authentication")
+#                     conn.close()
+#                     return render_template('selectvenue.html',mis = mis)
+#                 else:
+#                     # Authentication failed, render login.html with an error message
+#                     print("Authentication failed")
+#                     conn.close()
+#                     return render_template("login.html", error="Incorrect password/MIS. Please try again.")
+        
+#         else:
+#             conn.close()
+#             return render_template("student.html", error="The user dose not exist. Please register")
+        
+#     else:
+#             return render_template("login.html")
+
 @app.route("/authenticate", methods=['POST', 'GET'])
 def authenticate():
     if request.method == 'POST':
-        # Retrieve form data
         firstname = request.form['username1']
         lastname = request.form['username2']
         mis = request.form['mis']
         password = request.form['password']
 
-        # Connect to the database
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname,lastname))
+        cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname, lastname))
         user = cursor.fetchone()
-        if(firstname == 'cap' and lastname == 'T' and password == admin_password):
-            return render_template('adminlogin.html')   
-
-        if(user):            
-            # Check if the username and password match a record in the database
+        if firstname == 'cap' and lastname == 'T' and check_password_hash(admin_password_hash, password):
+            return render_template('adminlogin.html')
+        if user:
             conn = sqlite3.connect('database.db')
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=? AND mis=?', (firstname,lastname,password,mis))
+            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND mis=?', (firstname, lastname, mis))
             userandpass = cursor.fetchone()
 
-            if(firstname == 'cap' and lastname == 'T' and password == admin_password):
-                return render_template('adminlogin.html')            
+            if userandpass and check_password_hash(userandpass[3], password):  #Checking the password
+                print("Successful authentication")
+                conn.close()
+                return render_template('selectvenue.html', mis=mis)
             else:
-                if userandpass:
-                    # Successful authentication, redirect to selectvenue.html
-                    print("Successful authentication")
-                    conn.close()
-                    return render_template('selectvenue.html',mis = mis)
-                else:
-                    # Authentication failed, render login.html with an error message
-                    print("Authentication failed")
-                    conn.close()
-                    return render_template("login.html", error="Incorrect password/MIS. Please try again.")
-        
+                print("Authentication failed")
+                conn.close()
+                return render_template("login.html", error="Incorrect password/MIS. Please try again.")
         else:
             conn.close()
-            return render_template("student.html", error="The user dose not exist. Please register")
-        
+            return render_template("student.html", error="The user does not exist. Please register")
     else:
-            return render_template("login.html")
+        return render_template("login.html")
 
+# @app.route("/addrec", methods = ['POST', 'GET'])
+# def addrec():
+#     if request.method == 'POST':
+#         try:
+#             firstname = request.form['username1']
+#             lastname = request.form['username2']
+#             email = request.form['email']
+#             mis = request.form['mis']
+#             password = request.form['password']
+#             cpassword = request.form['cpassword']
+#             with sqlite3.connect('database.db') as con:
+#                 cur = con.cursor()
+#                 cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)", (firstname, lastname, email, password, mis))
 
-@app.route("/addrec", methods = ['POST', 'GET'])
+#                 con.commit()
+#                 msg = "You have successfully created an account. Please proceed to login."
+#         except:
+#             con.rollback()
+#             msg = "Error in the INSERT"
+
+#         finally:
+#             con.close()
+#             return render_template('login.html',msg=msg)
+
+@app.route("/addrec", methods=['POST', 'GET'])
 def addrec():
     if request.method == 'POST':
         try:
@@ -85,19 +143,24 @@ def addrec():
             mis = request.form['mis']
             password = request.form['password']
             cpassword = request.form['cpassword']
-            with sqlite3.connect('database.db') as con:
-                cur = con.cursor()
-                cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)", (firstname, lastname, email, password, mis))
-
-                con.commit()
-                msg = "You have successfully created an account. Please proceed to login."
+            if password != cpassword:
+                return render_template('student.html', error="Passwords do not match")
+            else:
+                # Hash the password before storing
+                hashed_password = generate_password_hash(password)
+                with sqlite3.connect('database.db') as con:
+                    cur = con.cursor()
+                    cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)",
+                                (firstname, lastname, email, hashed_password, mis))
+                    con.commit()
+                    msg = "You have successfully created an account. Please proceed to login."
         except:
             con.rollback()
             msg = "Error in the INSERT"
 
         finally:
             con.close()
-            return render_template('login.html',msg=msg)
+            return render_template('login.html', msg=msg)
 
 @app.route('/list')
 def list():
@@ -175,7 +238,8 @@ def delete():
 @app.route("/redirect", methods=['POST','GET'])
 def redirect():
     return render_template('adminlogin.html')
-    
+
+
 @app.route("/redirectvenue", methods=['POST'])
 def redirectvenue():
     current_day = datetime.now().strftime('%A') 
