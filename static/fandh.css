@@ -64,7 +64,10 @@ footer {
     font-family: 'Anton', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     color: white;
     padding: 8px 5px 8px 5px;
-    text-align: center; /* Align text in the center */
+    align-items: center; /* Align text in the center */
+     /* Use flexbox layout */
+    justify-content: center; /* Center items horizontally */
+    align-items: center;
 }
 
 .navbar a {
@@ -88,7 +91,7 @@ body {
     display: flex;
     flex-direction: column;
     margin: 0;
-    background-color: rgb(236, 236, 236);
+    background-color: rgb(225, 243, 254);
 }
 
 .body-content {

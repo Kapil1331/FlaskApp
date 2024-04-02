@@ -1,4 +1,15 @@
+
 <!DOCTYPE html>
+<style>
+    .coep-logo {
+    width: 100px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    }
+    .navbar {
+        display: flex;
+    align-items: center; /* Vertically center items */
+    }
+</style>
 <html>
     <head>
         <meta charset="utf-8" />
@@ -82,6 +93,9 @@
     <body onload="just_load()">
         
         <div class="navbar">
+            <!-- <a href="{{ url_for('home') }}" class="navbar-brand">
+                <img src="{{ url_for('static', filename='coeptechlogoblck.png')}}" alt="COEP Tech Logo" class="coep-logo">
+            </a> -->
             <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
             <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
             <a href="{{ url_for('enternew') }}" class="navbar-item">Register</a>

@@ -29,7 +29,7 @@
 </style>
 {% extends "layout.html" %}
 {% block title %}
-    Academic Complex Floor 1 - {{ current_day }}
+    Auditorium - {{ current_day }}
 {% endblock %}
 {% block content %}
 <div class="seat-container">
@@ -37,7 +37,7 @@
         <h2>Availability for {{ current_day }}</h2>
     </div>
     {% if not pdf %}
-        <p>Which seat do you want to book?</p>
+        <p>Which slot do you want to book?</p>
     {% endif %}    
     {% if error %}
         <p class="error-message">{{ error }}</p>
