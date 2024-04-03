@@ -12,7 +12,8 @@ import random
 app = Flask(__name__)
 QRcode(app)
 admin_id = 'cap'
-admin_password = '1234'
+admin_password_hash = generate_password_hash('1234')  # Hash the admin password
+
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -29,53 +30,172 @@ def page_not_found(e):
 def login():
     return render_template("login.html")
 
+# @app.route("/authenticate", methods=['POST', 'GET'])
+# def authenticate():
+#     if request.method == 'POST':
+#         # Retrieve form data
+#         firstname = request.form['username1']
+#         lastname = request.form['username2']
+#         mis = request.form['mis']
+#         password = request.form['password']
+
+#         # Connect to the database
+#         conn = sqlite3.connect('database.db')
+#         cursor = conn.cursor()
+#         cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname,lastname))
+#         user = cursor.fetchone()
+#         if(firstname == 'cap' and lastname == 'T' and password == admin_password):
+#             return render_template('adminlogin.html')   
+
+#         if(user):            
+#             # Check if the username and password match a record in the database
+#             conn = sqlite3.connect('database.db')
+#             cursor = conn.cursor()
+#             cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=? AND mis=?', (firstname,lastname,password,mis))
+#             userandpass = cursor.fetchone()
+
+#             if(firstname == 'cap' and lastname == 'T' and password == admin_password):
+#                 return render_template('adminlogin.html')            
+#             else:
+#                 if userandpass:
+#                     # Successful authentication, redirect to selectvenue.html
+#                     print("Successful authentication")
+#                     conn.close()
+#                     return render_template('selectvenue.html',mis = mis)
+#                 else:
+#                     # Authentication failed, render login.html with an error message
+#                     print("Authentication failed")
+#                     conn.close()
+#                     return render_template("login.html", error="Incorrect password/MIS. Please try again.")
+        
+#         else:
+#             conn.close()
+#             return render_template("student.html", error="The user dose not exist. Please register")
+        
+#     else:
+#             return render_template("login.html")
+
 @app.route("/authenticate", methods=['POST', 'GET'])
 def authenticate():
     if request.method == 'POST':
-        # Retrieve form data
         firstname = request.form['username1']
         lastname = request.form['username2']
         mis = request.form['mis']
         password = request.form['password']
 
-        # Connect to the database
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname,lastname))
+        cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=?', (firstname, lastname))
         user = cursor.fetchone()
-        if(firstname == 'cap' and lastname == 'T' and password == admin_password):
-            return render_template('adminlogin.html')   
-
-        if(user):            
-            # Check if the username and password match a record in the database
+        if firstname == 'cap' and lastname == 'T' and check_password_hash(admin_password_hash, password):
+            return render_template('adminlogin.html')
+        if user:
             conn = sqlite3.connect('database.db')
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND password=? AND mis=?', (firstname,lastname,password,mis))
+            cursor.execute('SELECT * FROM students2 WHERE firstname=? AND lastname=? AND mis=?', (firstname, lastname, mis))
             userandpass = cursor.fetchone()
 
-            if(firstname == 'cap' and lastname == 'T' and password == admin_password):
-                return render_template('adminlogin.html')            
+            if userandpass and check_password_hash(userandpass[3], password):  #Checking the password
+                print("Successful authentication")
+                conn.close()
+                return render_template('selectvenue.html', mis=mis)
             else:
-                if userandpass:
-                    # Successful authentication, redirect to selectvenue.html
-                    print("Successful authentication")
-                    conn.close()
-                    return render_template('selectvenue.html',mis = mis)
-                else:
-                    # Authentication failed, render login.html with an error message
-                    print("Authentication failed")
-                    conn.close()
-                    return render_template("login.html", error="Incorrect password/MIS. Please try again.")
-        
+                print("Authentication failed")
+                conn.close()
+                return render_template("login.html", error="Incorrect password/MIS. Please try again.")
         else:
             conn.close()
-            return render_template("student.html", error="The user dose not exist. Please register")
-        
+            return render_template("student.html", error="The user does not exist. Please register")
     else:
-            return render_template("login.html")
+        return render_template("login.html")
 
+# @app.route("/addrec", methods = ['POST', 'GET'])
+# def addrec():
+#     if request.method == 'POST':
+#         try:
+#             firstname = request.form['username1']
+#             lastname = request.form['username2']
+#             email = request.form['email']
+#             mis = request.form['mis']
+#             password = request.form['password']
+#             cpassword = request.form['cpassword']
+#             with sqlite3.connect('database.db') as con:
+#                 cur = con.cursor()
+#                 cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)", (firstname, lastname, email, password, mis))
 
-@app.route("/addrec", methods = ['POST', 'GET'])
+#                 con.commit()
+#                 msg = "You have successfully created an account. Please proceed to login."
+#         except:
+#             con.rollback()
+#             msg = "Error in the INSERT"
+
+#         finally:
+#             con.close()
+#             return render_template('login.html',msg=msg)
+
+class Database:
+    @staticmethod
+    def get_room_availability(room_id, current_day, time_slot, floor):
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+
+        table_name = f'acFloor{floor}'
+        
+        query = f"SELECT {room_id} FROM {table_name} WHERE day = ? AND time_slot = ? AND {room_id} IS NOT NULL"
+        cursor.execute(query, (current_day, time_slot))
+        
+        result = cursor.fetchone()
+        
+        if result:
+            availability = result[0]
+            return availability
+        else:
+            return None  # Return None if no availability is found
+    @staticmethod
+    def get_auditorium_seat_availability(seat_number, row_label, current_day):
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        row_label = chr(ord('a') + int(row_label) - 1) # converts numbers to alphabets
+        # seat_number = seat_number + 32 * (ord(row_label.lower()) - ord('a')) 
+
+        query = "SELECT status FROM mainAuditorium WHERE seat_number = ? AND row_label = ? AND day = ?"
+        cursor.execute(query, (seat_number, row_label, current_day))
+        
+        result = cursor.fetchone()
+        
+        if result:
+            availability = result[0]
+            return availability
+        else:
+            return None
+    @staticmethod
+    def update_room_status(room_id, current_day, time_slot, floor, status):
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        if(floor == 1) :
+            query = f"UPDATE acFloor1 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
+            cursor.execute(query, (status, current_day, time_slot))
+        elif(floor == 2):
+            query = f"UPDATE acFloor2 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
+            cursor.execute(query, (status, current_day, time_slot))       
+        conn.commit()
+        conn.close()
+    @staticmethod
+    def update_seat_status(seat_num, row_label, current_day, status):
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+
+        # row_label_numeric = ord(row_label.lower()) - ord('a') + 1
+        # seat_num_adjusted = seat_num + 32 * (row_label_numeric - 1)
+
+        query = f"UPDATE mainAuditorium SET status = ? WHERE day = ? AND row_label = ? AND seat_number = ?"
+        cursor.execute(query, (status, current_day, row_label, seat_num))
+
+        conn.commit()
+        conn.close()
+
+@app.route("/addrec", methods=['POST', 'GET'])
 def addrec():
     if request.method == 'POST':
         try:
@@ -85,19 +205,24 @@ def addrec():
             mis = request.form['mis']
             password = request.form['password']
             cpassword = request.form['cpassword']
-            with sqlite3.connect('database.db') as con:
-                cur = con.cursor()
-                cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)", (firstname, lastname, email, password, mis))
-
-                con.commit()
-                msg = "You have successfully created an account. Please proceed to login."
+            if password != cpassword:
+                return render_template('student.html', error="Passwords do not match")
+            else:
+                # Hash the password before storing
+                hashed_password = generate_password_hash(password)
+                with sqlite3.connect('database.db') as con:
+                    cur = con.cursor()
+                    cur.execute("INSERT INTO students2 (firstname, lastname, email, password, mis) VALUES (?,?,?,?,?)",
+                                (firstname, lastname, email, hashed_password, mis))
+                    con.commit()
+                    msg = "You have successfully created an account. Please proceed to login."
         except:
             con.rollback()
             msg = "Error in the INSERT"
 
         finally:
             con.close()
-            return render_template('login.html',msg=msg)
+            return render_template('login.html', msg=msg)
 
 @app.route('/list')
 def list():
@@ -175,7 +300,8 @@ def delete():
 @app.route("/redirect", methods=['POST','GET'])
 def redirect():
     return render_template('adminlogin.html')
-    
+
+
 @app.route("/redirectvenue", methods=['POST'])
 def redirectvenue():
     current_day = datetime.now().strftime('%A') 
@@ -186,13 +312,13 @@ def redirectvenue():
         error = "No venue selected. Please select one"
         return render_template('selectvenue.html', error = error)  
     if selected_venue == 'Auditorium':
-        return render_template('auditorium.html',current_day=current_day, get_auditorium_seat_availability = get_auditorium_seat_availability, mis = mis)
+        return render_template('auditorium.html',current_day=current_day, get_auditorium_seat_availability = Database.get_auditorium_seat_availability, mis = mis)
     elif selected_venue == 'parking_slot':
-        return render_template('parking_slot.html', mis = mis)
+        return render_template('parking_slot.html',current_day=current_day, get_auditorium_seat_availability = Database.get_auditorium_seat_availability, mis = mis)
     elif selected_venue == 'AC_building_1':
-        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1, mis = mis)
+        return render_template('acfloor1.html', current_day=current_day, get_room_availability=Database.get_room_availability, floor=1, mis = mis)
     elif selected_venue == 'AC_building_2':
-        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2, mis = mis)
+        return render_template('acfloor2.html', current_day=current_day, get_room_availability=Database.get_room_availability, floor=2, mis = mis)
     else: 
         return render_template('selectvenue.html')  
 
@@ -215,22 +341,22 @@ def bookseat():
     current_day =  request.form.get('day')
     if not row or not column:
         error = "Invalid seat number, re-enter"
-        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = Database.get_auditorium_seat_availability)
 
     if(int(row) > 25 or int(row) < 1 or int(column) > 32 or int(column) < 1):
         error = "Invalid seat number, re-enter"
-        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = Database.get_auditorium_seat_availability)
     receiptnum = (int(mis) // 5000) + int(row) + int(column) + random.randint(1,20)
     
-    if get_auditorium_seat_availability(column, row, current_day) == 'Occupied':
+    if Database.get_auditorium_seat_availability(column, row, current_day) == 'Occupied':
         error = "The seat you have booked is already Occupied! Select another seat."
-        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = Database.get_auditorium_seat_availability)
 
     row_label = chr(int(row) + 96)
     print(row_label)
     if(int(row) > 25 or int(row) < 1 or int(column) > 32 or int(column) < 1):
         error = "Invalid seat number, re-enter"
-        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = get_auditorium_seat_availability)        
+        return render_template("auditorium.html", current_day = current_day, mis = mis, error = error, get_auditorium_seat_availability = Database.get_auditorium_seat_availability)        
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     table_name = "mainAuditorium"
@@ -239,7 +365,7 @@ def bookseat():
     conn.commit()
     conn.close()
     pdf = "positive"
-    return render_template("auditorium.html", receiptnum = receiptnum ,current_day = current_day, mis = mis, pdf = pdf, get_auditorium_seat_availability = get_auditorium_seat_availability, column = column , row = row)        
+    return render_template("auditorium.html", receiptnum = receiptnum ,current_day = current_day, mis = mis, pdf = pdf, get_auditorium_seat_availability = Database.get_auditorium_seat_availability, column = column , row = row)        
 
 @app.route("/generate_pdf", methods=['POST'])
 def generate_pdf():
@@ -260,50 +386,15 @@ def generate_pdf():
     response = Response(pdf, headers=headers)
     return response
 
-def get_room_availability(room_id, current_day, time_slot, floor):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    table_name = f'acFloor{floor}'
-    
-    query = f"SELECT {room_id} FROM {table_name} WHERE day = ? AND time_slot = ? AND {room_id} IS NOT NULL"
-    cursor.execute(query, (current_day, time_slot))
-    
-    result = cursor.fetchone()
-    
-    if result:
-        availability = result[0]
-        return availability
-    else:
-        return None  # Return None if no availability is found
-
-def get_auditorium_seat_availability(seat_number, row_label, current_day):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    
-    row_label = chr(ord('a') + int(row_label) - 1) # converts numbers to alphabets
-    # seat_number = seat_number + 32 * (ord(row_label.lower()) - ord('a')) 
-
-    query = "SELECT status FROM mainAuditorium WHERE seat_number = ? AND row_label = ? AND day = ?"
-    cursor.execute(query, (seat_number, row_label, current_day))
-    
-    result = cursor.fetchone()
-    
-    if result:
-        availability = result[0]
-        return availability
-    else:
-        return None
-
 
 @app.route("/selectacfloor", methods=['POST','GET'])
 def selectacfloor():
     selected_venue = request.args.get('venue')
     current_day = datetime.now().strftime('%A')
     if selected_venue == '1':
-        return render_template('acfloor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+        return render_template('acfloor1.html', current_day=current_day, get_room_availability=Database.get_room_availability, floor=1)
     elif selected_venue == '2':
-        return render_template('acfloor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
+        return render_template('acfloor2.html', current_day=current_day, get_room_availability=Database.get_room_availability, floor=2)
     else:
         return render_template('AC_building.html')
 
@@ -318,28 +409,16 @@ def editvenue():
     
     # current_day = datetime.now().strftime('%A')    
     if selected_venue == 'Auditorium':
-        return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=get_auditorium_seat_availability)
+        return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=Database.get_auditorium_seat_availability)
     elif selected_venue == 'parking_slot':
-        return render_template('editparking_slot.html')
+        return render_template('editparking_slot.html',current_day=current_day, get_auditorium_seat_availability=Database.get_auditorium_seat_availability)
     elif selected_venue == 'AC_floor1':
-        return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=get_room_availability, floor=1)
+        return render_template('editAC_floor1.html', current_day=current_day, get_room_availability=Database.get_room_availability, floor=1)
     elif selected_venue == 'AC_floor2':
-        return render_template('editAC_floor2.html', current_day=current_day, get_room_availability=get_room_availability, floor=2)
+        return render_template('editAC_floor2.html', current_day=current_day, get_room_availability=Database.get_room_availability, floor=2)
     else: 
         return render_template('selectvenue.html')
     
-
-def update_room_status(room_id, current_day, time_slot, floor, status):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    if(floor == 1) :
-        query = f"UPDATE acFloor1 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
-        cursor.execute(query, (status, current_day, time_slot))
-    elif(floor == 2):
-        query = f"UPDATE acFloor2 SET {room_id} = ? WHERE day = ? AND time_slot = ?"
-        cursor.execute(query, (status, current_day, time_slot))       
-    conn.commit()
-    conn.close()
 
 @app.route("/changeACdatabase", methods=['POST'])
 def changeACdatabase():
@@ -364,7 +443,7 @@ def changeACdatabase():
                     first_number += 12     
                 arr[first_number - 9][int(room_number)-1] = 1            
                 status = 'Occupied'
-                update_room_status(room_id, selected_day, time_slot, 1, status)        
+                Database.update_room_status(room_id, selected_day, time_slot, 1, status)        
             for row_index, row in enumerate(arr):
                 for col_index, element in enumerate(row):
                     if element == 0:
@@ -384,11 +463,11 @@ def changeACdatabase():
                         
                         room_number = col_index + 1  # Add 1 to convert back to room number
                         room_id = 'r' + str(room_number + 100)  # Construct room ID
-                        update_room_status(room_id, selected_day, time_slot, 1, 'Vacant')
+                        Database.update_room_status(room_id, selected_day, time_slot, 1, 'Vacant')
                         # update_room_status(room_id, selected_day, time_slot, 1, 'Vacant')
 
         
-            return render_template('editAC_floor1.html', current_day=selected_day, get_room_availability=get_room_availability, floor=1)
+            return render_template('editAC_floor1.html', current_day=selected_day, get_room_availability=Database.get_room_availability, floor=1)
         else:
             for item in room_statuses:
                 room_number, time_slot = item.split('_')
@@ -401,7 +480,7 @@ def changeACdatabase():
                     first_number += 12     
                 arr[first_number - 9][int(room_number)-1] = 1            
                 status = 'Occupied'
-                update_room_status(room_id, selected_day, time_slot, 2, status)        
+                Database.update_room_status(room_id, selected_day, time_slot, 2, status)        
             for row_index, row in enumerate(arr):
                 for col_index, element in enumerate(row):
                     if element == 0:
@@ -420,23 +499,9 @@ def changeACdatabase():
                         
                         room_number = col_index + 1  # Add 1 to convert back to room number
                         room_id = 'r' + str(room_number + 200)  # Construct room ID
-                        update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
+                        Database.update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
                         # update_room_status(room_id, selected_day, time_slot, 2, 'Vacant')
-            return render_template('editAC_floor2.html', current_day=selected_day, get_room_availability=get_room_availability, floor=2)
-
-def update_seat_status(seat_num, row_label, current_day, status):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    # Adjust seat number based on the row_label
-    # row_label_numeric = ord(row_label.lower()) - ord('a') + 1
-    # seat_num_adjusted = seat_num + 32 * (row_label_numeric - 1)
-
-    query = f"UPDATE mainAuditorium SET status = ? WHERE day = ? AND row_label = ? AND seat_number = ?"
-    cursor.execute(query, (status, current_day, row_label, seat_num))
-
-    conn.commit()
-    conn.close()
+            return render_template('editAC_floor2.html', current_day=selected_day, get_room_availability=Database.get_room_availability, floor=2)
 
 @app.route("/changeAudidatabase", methods=['POST'])
 def changeAudidatabase():
@@ -451,7 +516,7 @@ def changeAudidatabase():
             seat_num, row_num = item.split('_')
             row_label = chr(ord('a') + int(row_num) - 1)
             arr[int(row_num) - 1][int(seat_num) - 1] = 1
-            update_seat_status(seat_num, row_label, current_day, status)
+            Database.update_seat_status(seat_num, row_label, current_day, status)
         print(arr)
         for row_index, row in enumerate(arr):
             for col_index, element in enumerate(row):
@@ -459,7 +524,7 @@ def changeAudidatabase():
                     status = 'Vacant'
                     row_label = chr(row_index + ord('a'))
                     seat_num = col_index + 1
-                update_seat_status(seat_num, row_label, current_day, status)
+                Database.update_seat_status(seat_num, row_label, current_day, status)
             
     
-        return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=get_auditorium_seat_availability)
+        return render_template('editauditorium.html',current_day=current_day, get_auditorium_seat_availability=Database.get_auditorium_seat_availability)

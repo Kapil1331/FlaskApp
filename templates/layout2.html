@@ -1,0 +1,131 @@
+<style>
+    .coep-logo {
+    width: 100px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    }
+    .navbar {
+        display: flex;
+    align-items: center; /* Vertically center items */
+    }
+</style>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fandh.css')}}" />
+        
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            function just_load(){
+                let timerInterval;
+                Swal.fire({
+                // title: "Auto close alert!",
+                html: "Loading ... <b></b>",
+                timer: 500,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                    const timer = Swal.getPopup().querySelector("b");
+                    timerInterval = setInterval(() => {
+                    timer.textContent = `${Swal.getTimerLeft()}`;
+                    }, 100);
+                },
+                willClose: () => {
+                    clearInterval(timerInterval);
+                }
+                }).then((result) => {
+                /* Read more about handling dismissals below */
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    console.log("I was closed by the timer");
+                }
+                });
+            }
+
+
+
+            function book_seat(){
+                Swal.fire({
+                title: "Enter Row and Column",
+                showConfirmButton: false,
+                html: `
+                <form action="bookseat" method="POST" class="seatbook">
+                    <input id="swal-input1 row" class="swal2-input" name="row" type="number" placeholder="row">
+                    <br>
+
+                    <input id="swal-input2 column" class="swal2-input" name="column" type="number" placeholder="column">
+
+                    <input type="hidden" name="misno" id="misno" value="{{ mis }}">
+                    <input type="hidden" name="day" id="day" value="{{ current_day }}">
+                    
+                    <input type="submit" value="BOOK" class="btn0 flash-slide flash-slide--blue booking-form">
+                </form>
+
+                    
+                `
+                // focusConfirm: false,
+                // preConfirm: () => {
+                //     return [
+                //     document.getElementById("swal-input1").value,
+                //     document.getElementById("swal-input2").value,
+                //     document.getElementById("misno").value,
+                //     document.getElementById("day").value
+                //     ];
+                // }
+                });
+                // if (formValues) {
+                // Swal.fire(JSON.stringify(formValues));
+                // }
+
+                // fetch("/bookseat", {
+                // method: "POST",
+                // // Set the FormData instance as the request body
+                // body: formValues,
+                // });
+            }
+        </script>
+
+    </head>
+        
+    <body onload="just_load()">
+        
+        <div class="navbar">
+            <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
+            <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
+            <a href="{{ url_for('enternew') }}" class="navbar-item">Register</a>
+            <a href="https://www.coeptech.ac.in/" class="navbar-item">COEP Tech</a>
+            <a href="http://portal.coep.org.in:9093/" class="navbar-item">MIS</a>
+            <a href="https://moodle.coep.org.in/moodle/login/index.php" class="navbar-item">Moodle</a>
+            <a href="{{ url_for('redirect') }}" class="navbar-item">Choose Venue</a>
+            <!-- <a href="{{ url_for('list') }}" class="navbar-item">Review and Edit Students</a> -->
+        </div>
+
+        <div class="body-content">
+            {% block content %}
+            {% endblock %}
+            <hr/>
+        </div>
+        <footer>
+            <div class="footer-content">
+                <!-- <p><img src="{{ url_for('static', filename='logo.png')}}" width="60" height="60">&copy; 2024</p> -->
+                <div class="top-content">
+                    <a href="#" class="footer-link">Home</a>
+                    <a href="#" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Services</a>
+                    <a href="#" class="footer-link">Team</a>
+                    <a href="#" class="footer-link">Contact</a> 
+                </div>
+                <div class="bottom-content">
+                    <p>&copy;2024 COEP Tech | All Rights Reserved</p>
+                </div>
+            </div>
+        </footer>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+        
+    </body>
+</html>

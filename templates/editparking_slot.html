@@ -1,0 +1,174 @@
+<style>
+    .seat {
+        position: relative; 
+        width: 30px;
+        height: 30px;
+        background-color: #e6e6e6;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-right: 5px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    
+    }
+    .seat-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        
+    }
+    
+    .seat-number {
+        position: absolute; 
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        font-size: 12px; 
+    }
+    
+    .seat-label {
+        margin-right: 10px;
+        width: 70px;
+        text-align: center;
+        font-weight: bold; 
+    }
+    
+    .seat:hover {
+        background-color: #d9d9d9;
+    }
+    
+    .seat.selected {
+        background-color: #007bff; 
+        border-color: #0056b3;
+        color: #fff; 
+    }
+    
+    .passage {
+        width: 50px; 
+        flex: 0 0 auto;
+    }
+    
+    .passage2 {
+        width: 5px;
+        flex: 0 0 auto;
+    }
+    
+    .clear {
+        clear: both;
+    }
+    .checkBoxAudi {
+        display: block;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        border: 3px solid #716f6f; 
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0px 0px 0px 2px #fff;
+        justify-content: center; 
+        align-items: center;
+        display: flex; 
+    }
+    
+    .checkBoxAudi div {
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    top: -52px;
+    left: -52px;
+    position: absolute;
+    transform: rotateZ(45deg);
+    z-index: 100;
+    }
+    
+    .checkBoxAudi input[type=checkbox]:checked + div {
+    left: -10px;
+    top: -10px;
+    background-color: dodgerblue;
+    }
+    
+    .checkBoxAudi input[type=checkbox] {
+    position: absolute;
+    left: 50px;
+    visibility: hidden;
+    }
+    
+    .transition {
+    transition: 300ms ease;
+    }
+    
+    .top-columns {
+        display: flexbox; 
+    }
+    
+    
+    .row_head {
+        /* border: none; */
+        border-color: rgb(189, 189, 189);
+        font-weight: 900;
+        font-size: large;
+    }
+    
+    </style>
+    {% extends "layout2.html" %}
+    {% block title %}
+        Parking
+    {% endblock %}
+    {% block content %}
+    <form action="{{ url_for('changeAudidatabase') }}" method="post">
+    <div class="seat-container">
+        <div style="width: 100%; text-align: center;">
+            <h2>Availability for {{ current_day }}</h2>
+        </div>
+        {% set total_rows = 25 %}
+        {% set total_seats_per_row = 32 %}
+             
+        <input type="hidden" name="dummy_variable" value="{{ current_day }}">
+            <div class="seat-row">
+                <div class="seat-label"></div>
+                {% for seat_num in range(1, total_seats_per_row + 1) %}
+                    {% if seat_num == 7 or seat_num == 27 %}
+                        <div class="passage"></div>
+                    {% endif %}
+                    <div class="passage2"></div>
+                    <div class="content checkBoxAudi mycheckbox row_head">
+                        {{ seat_num }}
+                    </div>
+                {% endfor %}
+            </div>
+    
+    
+    
+    
+        {% for row_num in range(1, total_rows + 1) %}
+        <input type="hidden" name="dummy_variable" value="{{ current_day }}">
+            <div class="seat-row">
+                <div class="seat-label">Row {{ row_num }}</div>
+                {% for seat_num in range(1, total_seats_per_row + 1) %}
+                    {% if seat_num == 7 or seat_num == 27 %}
+                        <div class="passage"></div>
+                    {% endif %}
+                    <div class="passage2"></div>
+                    <div class="content">
+                        <label class="checkBoxAudi">
+                            <input name="mycheckbox" value="{{ seat_num }}_{{ row_num }}" type="checkbox"{% if get_auditorium_seat_availability(seat_num, row_num, current_day) == 'Occupied' %}checked{% endif %}>
+                            <!-- {% if get_auditorium_seat_availability(seat_num, row_num, current_day) == 'Vacant' %}
+                                <span>{{ seat_num }}</span>
+                            {% endif %} -->
+                            <div class="transition"></div>
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    <div style="text-align: center;">
+        <button type="submit" style="background-color: dodgerblue; color: white; border-radius: 5px; padding: 10px 20px; border: none; font-size: 16px; font-weight: bold;">Submit Changes</button>
+    </div>
+    </form>
+    {% endblock %}
+    

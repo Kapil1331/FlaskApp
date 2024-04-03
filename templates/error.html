@@ -1,1 +1,7 @@
-Handle the 404 error
+{% extends "layout.html" %}
+{% block title %}
+    404 Error
+{% endblock %}
+{% block content %}
+<img src="{{ url_for('static', filename='404.jpg') }}" alt="404 Error" style="max-width: 75%; height: auto;">
+{% endblock %}
